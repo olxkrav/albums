@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мои альбомы Google Фото</title>
+    <link rel="icon" href="https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Google_Photos_icon_%282020%29.svg/1024px-Google_Photos_icon_%282020%29.svg.png" type="image/svg+xml">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        /* === Переменные Цветов (Dark/Light Theme) === */
+        :root {
+            --color-text-light: #444746; /* Текст шапки, карточек (body) (почти черный) */
+            --color-text-dark: #C4C7C5; /* Текст шапки, карточек (body.dark-theme)(грязно-белый) */
+            --color-background-light: #F0F4F9; /* Фон (body) (почти белый) */
+            --color-background-dark: #1E1F20; /* Фон(body.dark-theme) (почти черный) */
+            --color-surface-light: #d8dadb; /* Подсветка кнопок, фон сортировки, поиска... (светло-серый) */
+            --color-surface-dark: #3c4043; /* Подсветка кнопок, фон сортировки, поиска... (светло-серый) */
+            --color-card-background-light: #ffffff; /* Фон карточек, фон меню годов и сортировки, фон колокольчика (белый) */
+            --color-card-background-dark: #292a2e; /* Фон карточек, фон меню годов и сортировки, фон колокольчика (темно-серый) */
+            --color-divider-light: #C4C7C5; /* Разделитель шапки светлой темы */
+            --color-divider-dark: #444746; /* Разделитель шапки темной темы */
+            --color-link-active-light: #004A77; /* Активный год, пункт меню (черный) */
+            --color-link-active-dark: #C2E7FF; /* Активный год, пункт меню (голубой) */
+            --color-link-active-highlight-light: #C2E7FF; /* Обводка Активный год, пункт меню (голубой) */
+            --color-link-active-highlight-dark: #004A77; /* Обводка Активный год, пункт меню (голубой) */
+	    --color-badge-light: #004A77; /* Колокольчик (голубой) */
+	    --color-badge-dark: #C2E7FF; /* Колокольчик (голубой) */
+            --color-shadow-light: rgba(60, 64, 67, 0.15);
+            --color-shadow-dark: rgba(0, 0, 0, 0.5);
+            --font-size-small: 14px; /* Единый размер шрифта для интерактивных элементов */
+            --header-item-spacing: 8px; /* Одинаковый промежуток в шапке */
+            --header-element-height: 36px; /* Одинаковая высота кнопок */
+            --search-width-desktop: 180px; 
+            --search-width-mobile: 130px; 
+        }
+
+        /* --- Стили для Темной Темы --- */
+        body.dark-theme {
+            --color-text: var(--color-text-dark); /* Цвет всего текста темной темы (кроме активных) */
+            --color-text-on-surface: #e8eaed; /* ??? */
+            --color-background: var(--color-background-dark); /* Цвет шапки и фона страницы */
+            --color-surface: var(--color-surface-dark); /* Подсветка кнопок смены темы, меню годов, годов(!), текущего года (!), пунктов меню годов и сортировки, поиска темной темы */
+            --color-card-background: var(--color-card-background-dark); /* фон карточек, колокольчика, меню годов, меню сортировки темной темы */
+            --color-divider: var(--color-divider-dark); /* Разделитель шапки темной темы */
+            --color-shadow: var(--color-shadow-dark); /* Тень под шапкой, меню, карточками, темная тема */
+	    --color-link-active: var(--color-link-active-dark); /* Активный год, пункт меню годов, сортировки, темная тема */
+	    --color-link-active-highlight: var(--color-link-active-highlight-dark);
+	    --color-badge: var(--color-badge-dark);
+        }
+
+        /* --- Стили для Светлой Темы (По умолчанию) --- */
+        body {
+            --color-text: var(--color-text-light); /* Цвет всего текста светлой темы (кроме активных) */
+            --color-text-on-surface: #202124; /* ??? */ 
+            --color-background: var(--color-background-light); /* Цвет шапки и фона страницы */
+            --color-surface: var(--color-surface-light); /* Подсветка кнопок смены темы, меню годов, годов, пунктов меню годов и сортировки, поиска светлой темы */
+            --color-card-background: var(--color-card-background-light); /* фон карточек, колокольчика, меню годов, меню сортировки светлой темы */
+            --color-divider: var(--color-divider-light); /* Разделитель шапки светлой темы */
+            --color-shadow: var(--color-shadow-light); /* Тень под шапкой, меню, карточками, светлая тема */
+	    --color-link-active: var(--color-link-active-light); /* Активный год, пункт меню годов, сортировки, светлая тема */
+	    --color-link-active-highlight: var(--color-link-active-highlight-light);
+	    --color-badge: var(--color-badge-light);
+
+        }
+
+        /* === Общие Стили === */
+        * {
+            box-sizing: border-box;
+            /* Скрытие полосы прокрутки для Firefox */
+            scrollbar-width: none; 
+        }
+
+        /* Скрытие полосы прокрутки для WebKit (Chrome, Safari, Edge) */
+        *::-webkit-scrollbar {
+            display: none; 
+            width: 0; 
+            height: 0;
+        }
+
+
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            margin: 0;
+            padding-top: 64px; 
+            background-color: var(--color-background); /* Фон страницы */
+            color: var(--color-text-on-surface); /* ??? */
+            transition: background-color 0.3s, color 0.3s; /* Скорость смены темы страницы */
+        }
+        
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* === Шапка (Header) === */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            padding: 0 24px; /* Desktop padding */
+            background-color: var(--color-background); /* Шапка */
+            border-bottom: 1px solid var(--color-divider); /* Ширина и цвет разделителя шапки */
+            box-shadow: 0 2px 4px var(--color-shadow); /* Ширина и цвет тени шапки */
+            z-index: 1000;
+            transition: background-color 0.3s, border-color 0.3s;  /* Скорость смены темы шапки */
+        }
+        
+        .logo-link {
+            display: flex;
+            align-items: center;
+            margin-right: 32px;
+            flex-shrink: 0; 
+            overflow: hidden; 
+        }
+        .logo {
+            width: 32px;
+            height: 32px;
+            margin-right: 8px;
+        }
+        
+        .logo-text {
+            font-size: 20px;
+            font-weight: 500;
+            color: var(--color-text); 
+            transform: translateY(-2px); 
+            white-space: nowrap; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+	    display: block;
+	    width: 118px;
+        }
+
+/* --- Фильтры Годов --- */
+        .filter-link {
+            /* === НОВЫЕ СТИЛИ (Фикс. ширина) === */
+            width: 56px; /* Сам элемент 56px */
+            margin-right: 8px; /* Отступ 8px. Итого: 64px */
+            padding: 0; /* Убираем паддинги, чтобы не влияли на ширину */
+            
+            display: inline-flex; /* Чтобы центрировать текст */
+            justify-content: center;
+            align-items: center;
+            
+            height: 32px; /* Высота как у остальных кнопок */
+            border-radius: 16px;
+            font-size: var(--font-size-small);
+            font-weight: 500;
+            color: var(--color-text);
+            transition: background-color 0.2s, color 0.2s;
+            cursor: pointer;
+            user-select: none;
+            flex-shrink: 0;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+        
+        /* --- Выпадающие Меню (Гамбургер и Сортировки) --- */
+        .menu-content, .sort-content {
+            display: none;
+            position: absolute;
+            top: 48px;
+            background-color: var(--color-card-background); /* Фон меню */
+            box-shadow: 0 4px 8px var(--color-shadow);
+            border-radius: 8px;
+            width: 64px;
+            z-index: 100;
+            padding: 0; 
+        }
+        .menu-content.show, .sort-content.show {
+            display: block;
+        }
+        
+        /* Стили для меню годов */
+        .menu-content {
+            left: 0; 
+            max-height: calc(16 * 1.4em + 20px); 
+            overflow-y: auto; 
+            scrollbar-width: thin; 
+            scrollbar-color: var(--color-text) var(--color-surface);
+        }
+        /* Стилизация скроллбара для WebKit */
+        .menu-content::-webkit-scrollbar {
+            display: block; 
+            width: 8px;
+        }
+        .menu-content::-webkit-scrollbar-thumb {
+            background-color: var(--color-text);
+            border-radius: 10px;
+        }
+        .menu-content::-webkit-scrollbar-track {
+            background: var(--color-surface);
+        }
+        
+        /* Стили для меню сортировки */
+        .sort-content {
+            left: 50%; /* ВЫРАВНИВАНИЕ ПО ЦЕНТРУ КНОПКИ */
+            transform: translateX(-50%); 
+            max-height: calc(16 * 1.4em + 20px); 
+            overflow-y: auto; 
+            scrollbar-width: thin; 
+            scrollbar-color: var(--color-text) var(--color-surface);
+            width: 200px; 
+        }
+        .sort-content::-webkit-scrollbar {
+            display: block; 
+            width: 8px;
+        }
+        .sort-content::-webkit-scrollbar-thumb {
+            background-color: var(--color-text);
+            border-radius: 10px;
+        }
+        .sort-content::-webkit-scrollbar-track {
+            background: var(--color-surface);
+        }
+
+
+        /* Стиль пунктов меню */
+        .menu-content-item, .sort-content-item {
+            display: block;
+            padding: 10px 8px; 
+            font-size: var(--font-size-small); 
+            font-weight: 500;
+            color: var(--color-text); 
+            cursor: pointer;
+            white-space: nowrap;
+            position: relative;
+        }
+        .menu-content-item:hover, .sort-content-item:hover {
+            background-color: var(--color-surface);
+        }
+        
+        /* ПОДСВЕТКА ТЕКУЩЕГО ГОДА И СОРТИРОВКИ В МЕНЮ */
+        .menu-content-item.active, .sort-content-item.active {
+            color: var(--color-link-active);
+            font-weight: 500;
+	    background-color: var(--color-link-active-highlight); /* Обводка текущего года в меню годов и сортировки */
+        }
+        
+        /* Гамбургер-Меню (для годов) */
+        .menu-dropdown {
+            position: relative;
+            display: none;
+            margin-right: var(--header-item-spacing); 
+            flex-shrink: 0;
+        }
+        
+        /* Меню Сортировки */
+        .sort-dropdown {
+            margin-right: 12px; 
+            position: relative;
+            flex-shrink: 0;
+        }
+        .sort-button {
+            display: flex;
+            align-items: center;
+            padding: 0 12px 0 8px; 
+            height: var(--header-element-height); 
+            width: 200px; 
+            border-radius: 18px;
+            background-color: var(--color-surface);
+            font-size: var(--font-size-small);
+            font-weight: 500;
+            cursor: pointer;
+            user-select: none;
+            color: var(--color-text); 
+            transition: background-color 0.2s, width 0.3s, padding 0.3s;
+        }
+        .sort-button:hover {
+            filter: brightness(0.9);
+        }
+        /* Иконка на самой кнопке сортировки */
+        .sort-button-icon {
+            margin-right: 8px; 
+            font-size: 20px;
+            color: var(--color-text); 
+        }
+        .sort-button-text {
+            /* Текст "Самые новые" */
+            transition: opacity 0.3s;
+        }
+        
+        /* Иконки в меню сортировки */
+        .sort-content-item {
+            display: flex;
+            align-items: center;
+        }
+        .sort-content-item .material-icons {
+            margin-right: 12px;
+            font-size: 20px;
+            color: var(--color-text); 
+        }
+
+        /* --- Поле Поиска --- */
+        .search-container {
+            margin-right: var(--header-item-spacing); /* Now 8px */
+            position: relative;
+            flex-grow: 0; 
+            width: 180px; /* Теперь 180px */
+            transition: width 0.3s, flex-grow 0.3s, max-width 0.3s;
+            flex-shrink: 0; /* ФИКСИРОВАННАЯ ШИРИНА */
+
+        }
+        .search-input {
+            padding: 0 36px 0 40px; 
+            border: none;
+            border-radius: 20px;
+            background-color: var(--color-surface);
+            color: var(--color-text); 
+            font-size: var(--font-size-small); 
+            width: 100%; 
+            outline: none;
+            transition: background-color 0.3s;
+            height: var(--header-element-height); 
+        }
+	.search-input:hover {
+            background-color: var(--color-card-background);
+        }
+	.search-input:focus {
+            background-color: var(--color-card-background);
+        }
+        /* Иконка поиска */
+        .search-icon {
+            position: absolute;
+            left: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--color-text); 
+            pointer-events: none; 
+            transition: opacity 0.3s, left 0.3s, right 0.3s;
+            opacity: 1; /* Иконка всегда видна */
+	    z-index: 10;
+        }
+        /* Кнопка очистки */
+        .clear-button {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--color-text); 
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 50%;
+            font-size: 20px;
+            transition: background-color 0.2s;
+        }
+        .clear-button:hover {
+            background-color: var(--color-background);
+        }
+
+        /* --- Кнопка Переключения Темы --- */
+.theme-button {
+    margin-right: var(--header-item-spacing);
+    
+    /* === ИЗМЕНЕНИЯ: Фиксированный размер === */
+    width: 40px;             /* Явная ширина */
+    height: 40px;            /* Явная высота */
+    padding: 0;              /* Убираем отступы */
+    display: flex;           /* Включаем Flexbox */
+    align-items: center;     /* Центрируем по вертикали */
+    justify-content: center; /* Центрируем по горизонтали */
+
+    /* Остальные стили без изменений */
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.3s;
+    color: var(--color-text); 
+    flex-shrink: 0;
+}
+        .theme-button:hover {
+            background-color: var(--color-surface);
+        }
+
+	/* === Значок Недавно Добавленного Альбома (New) === */
+        .new-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--color-card-background); /* Фон колокольчика */
+            box-shadow: 0 1px 3px var(--color-shadow);
+            z-index: 10;
+        }
+        .new-badge .material-icons {
+            font-size: 20px;
+            color: var(--color-link-active); /* Цвет колокольчика */
+        }
+
+        /* === Карточка Альбома === */
+        .album-info {
+            padding: 4px 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center; 
+            min-height: 48px; 
+        }
+
+        .album-title {
+            font-size: var(--font-size-small); 
+            font-weight: 500;
+            line-height: 1.4;
+            color: var(--color-text); 
+            display: -webkit-box;
+            -webkit-line-clamp: 2; 
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            max-height: calc(1.4em * 2); 
+        }
+        
+        /* --- Остальные стили для Header и Grid --- */
+        .filters {
+            display: flex;
+            flex-grow: 1; 
+            margin-right: 0; 
+            overflow: hidden;
+            flex-shrink: 1;
+        }
+        .filter-link:hover {
+            background-color: var(--color-surface);
+        }
+        .filter-link.active {
+            color: var(--color-link-active);
+            background-color: var(--color-link-active-highlight); /* Обводка текущего года в шапке */
+        }
+.menu-button {
+    /* === ИЗМЕНЕНИЯ: Фиксированный размер === */
+    width: 40px;             /* Явная ширина */
+    height: 40px;            /* Явная высота */
+    padding: 0;              /* Убираем отступы */
+    display: flex;           /* Включаем Flexbox */
+    align-items: center;     /* Центрируем по вертикали */
+    justify-content: center; /* Центрируем по горизонтали */
+   
+/* Остальные стили без изменений */
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    color: var(--color-text); 
+}
+        .menu-button:hover {
+            background-color: var(--color-surface); /* Подсветка кнопки меню годоы */
+        }
+        .profile-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            cursor: pointer;
+            border: 2px solid var(--color-surface); 
+            flex-shrink: 0;
+        }
+        .album-grid {
+            padding: 24px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 24px;
+        }
+        .album-card {
+            background-color: var(--color-card-background); /* Фон карточек */
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px var(--color-shadow), 0 1px 2px var(--color-shadow);
+            transition: box-shadow 0.3s, transform 0.3s, background-color 0.3s;
+        }
+        .album-card:hover {
+            box-shadow: 0 4px 8px var(--color-shadow), 0 6px 15px var(--color-shadow);
+            transform: translateY(-2px);
+        }
+        .album-card-link {
+            display: block;
+        }
+        .album-preview {
+            width: 100%;
+            padding-top: 56.25%; 
+            position: relative;
+            overflow: hidden;
+            background-size: cover;
+            background-position: center;
+        }
+        
+        /* === Адаптивные Стили (< 750px) === */
+        @media (max-width: 750px) {
+            /* Reduced padding for mobile header */
+            .header {
+                padding: 0 10px; 
+            }
+            
+            /* Надпись Google Фото исчезает */
+            .logo-text {
+                display: none;
+            }
+            /* Remove margin-right from logo link in mobile */
+            .logo-link {
+                margin-right: 0; 
+            }
+            
+            /* Кнопка Сортировки становится иконкой */
+            .sort-dropdown {
+                margin-right: var(--header-item-spacing); /* Now 8px */
+            }
+            .sort-button {
+                width: var(--header-element-height); 
+                padding: 0 8px; 
+                justify-content: center;
+            }
+            .sort-button-icon {
+                margin-right: 0;
+            }
+            /* Скрываем текст "Самые новые" и т.д. */
+            .sort-button-text {
+                display: none;
+                opacity: 0;
+            }
+            /* Центрируем меню сортировки по иконке */
+            .sort-content {
+                left: 50%; 
+                transform: translateX(-50%);
+	    }
+	/* 3. Поле Поиска (Фиксированная ширина) */
+            .search-container {
+		width: var(--search-width-mobile);
+            }
+
+            .search-input {
+                 /* Возвращаем отступ для иконки */
+                padding: 0 36px 0 40px; 
+                width: 100%;
+            }
+            .search-icon {
+                /* Возвращаем иконку на место */
+                left: 8px;
+                transform: translateY(-50%);
+                opacity: 1;
+                right: auto;
+            }
+            
+            .filters {
+                flex-grow: 0; 
+                flex-shrink: 1;
+                margin-right: 0; /* Убеждаемся, что отступ убран и здесь */
+            }
+        }
+    </style>
+</head>
+<body class="light-theme">
+
+    <header class="header" id="main-header">
+        <a href="https://photos.google.com/" class="logo-link">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Google_Photos_icon_%282020%29.svg/1024px-Google_Photos_icon_%282020%29.svg.png" alt="Google Photos Logo" class="logo">
+            <span class="logo-text">Google Фото</span>
+        </a>
+
+        <div class="filters" id="year-filters">
+            </div>
+        
+        <div class="menu-dropdown">
+            <span class="material-icons menu-button" id="menu-button">menu</span>
+            <div class="menu-content" id="menu-content">
+                </div>
+        </div>
+
+        <div class="sort-dropdown">
+            <div class="sort-button" id="sort-button">
+                <span class="material-icons sort-button-icon" id="sort-icon">arrow_downward</span>
+                <span id="sort-label" class="sort-button-text">Самые новые</span>
+            </div>
+            <div class="sort-content" id="sort-content">
+                <div class="sort-content-item" data-sort="newest"><span class="material-icons">arrow_downward</span>Самые новые</div>
+                <div class="sort-content-item" data-sort="oldest"><span class="material-icons">arrow_upward</span>Самые старые</div>
+                <div class="sort-content-item" data-sort="added"><span class="material-icons">notifications</span>Недавно добавленные</div>
+            </div>
+        </div>
+
+        <div class="search-container" id="search-container">
+            <span class="material-icons search-icon" id="search-icon-small">search</span>
+            <input type="text" id="search-input" class="search-input" placeholder="Поиск..." oninput="filterAlbums()">
+            <span class="material-icons clear-button" id="clear-search-button" style="display:none;">close</span>
+        </div>
+
+        <span class="material-icons theme-button" id="theme-toggle">nightlight_round</span>
+
+        <img src="https://lh3.googleusercontent.com/a/ACg8ocLU5rbDdy25qbia4Zv6ltz5hHFRWhP79PncRQ9CQ-cdm9nYRfxxmw=s96-c" alt="Profile Logo" class="profile-logo">
+    </header>
+
+    <main class="album-grid" id="album-grid">
+        </main>
+
+    <script>
+
+        // *** МАССИВ АЛЬБОМОВ ***
+        const albums = [
+
+  { id: 1, title: '2025.10.18 - The Art of the Brick: LEGO', date: '2025-10-18', addedDate: '2025-10-18', url: 'https://photos.google.com/share/AF1QipOL07Gdf5WhqNH_u-U2EtRjbTKI1Xq80xNxmBLm5thlY2FqSjoaxs5Ftv28HyXP2w?key=Q1dzUzhTam9Va3V3dUJhcndaSllVUEdyTDNJd3V3', previewUrl: 'https://lh3.googleusercontent.com/pw/AP1GczMuzdEDPTPi4RmHW8Qe9UVEo55ZquXneUYdPc5BA8dhbIzzYe-Vp5eqTpHgUwQAzysJe7Chm9v-BefIyQdY0HLzy1t5oB_A1NbnVNfzMWJmuyVCMmLT=w600-h315-p-k', year: '2025' },
+  { id: 2, title: '2025.06-10 - Июль-октябрь', date: '2025-10-12', addedDate: '2025-10-12', url: 'https://photos.google.com/share/AF1QipONnpB9m8BMKVaN15lZT1HKWzWLlyJ_-yPpJx2Nx37hwpxlXHAJuUq_mTvbh18d6A?key=N09BQUc5d3BkX2tMS3Ztb19xX3E4Z0NmeGkyUzZB', previewUrl: 'https://lh3.googleusercontent.com/pw/AP1GczOUU2ERZWT24-3OstV3ojOPxo9gb7AdhUcSnXkmx722phucU6KuBHRzKJkKS5IKLbaZmy9yrj2CiDm5IDG6tvTu_uLOwdg8VcCkrAPKQJQTugAhIkaL=w600-h315-p-k', year: '2025' },
+  { id: 3, title: '2025.10.11 - Mont-Rigaud', date: '2025-10-11', addedDate: '2025-10-11', url: 'https://photos.google.com/share/AF1QipOq7D5o7TUKLYpvcNGdKbLDkdQTONQb7j2u6yBXOsqMll0QpLynaqd-aCqrQJAruQ?key=ckFjcHEyWXdMQ1Q3VXpKZE04enctcWxYbEJwNzlB', previewUrl: 'https://lh3.googleusercontent.com/pw/AP1GczOc061P1RYpN6udUi86Gc8s4o1VtfXinRvSpUaiCeVey8ZMESATlVJXRLSH4IC-7IcRuuDAMA8Ty-pp-tRpvNTH33wwWSqE0GZwrsi6YSEKvvXL5jcY=w600-h315-p-k', year: '2025' },
+  { id: 4, title: '2025.08.30-31 - Regina 3', date: '2025-08-31', addedDate: '2025-08-31', url: 'https://photos.google.com/share/AF1QipOjF6X_GiUweoWxYNFevWtuNTgbc8rt5ZDBoKssybPOiKq3PTxN1uym1dBs6vzn0g?key=ZVFIUVVEZktkR1VsSG0zZ1ZBMDk1SGxmcGpmcU5R', previewUrl: 'https://lh3.googleusercontent.com/pw/AP1GczOClqsQQsW9EmrEYWg2RIxUc3x6wASfp40Et0FFHNdWG_sGtPY_Zd2GZiZfTVaONxUkmrvQGUGA0rN8Glr5gJw4JpJsYPFKmUAz-YVUMV30B_V1jGEg=w600-h315-p-k', year: '2025' },
+  { id: 5, title: '2025.07.20 - Автошоу на Иль-Перро', date: '2025-07-20', addedDate: '2025-07-20', url: 'https://photos.google.com/share/AF1QipPrXVV7n7DlRWCkOgld1DnSJrmhWxfoCR2XSXXRyOzDcBUy28NsXe7nzkSyysBWEw?key=ZUFHY1ZyZXBRd05kY0d3U0V1clZ3SGhKcUIwUHV3', previewUrl: 'https://lh3.googleusercontent.com/pw/AP1GczOk6h-_hHumsY67SLL0saF1knc5VvPo67PahQOwVLWLcRIFsqpdH3LB63y23d_3QlaEuMYe3e3bmzV__M7NVnILZr3w-QQFl8CwcTqo9u7sz5_otoma=w600-h315-p-k', year: '2025' },
+  { id: 6, title: '2025.07.10-12 - ДР Арсения в Canada\'s Wonderland, Торонто', date: '2025-07-12', addedDate: '2025-07-12', url: 'https://photos.google.com/share/AF1QipMpCbAVqDJXIC3iUW9YdzvPCluw4qbd44K5Z35uqLraSa0YIiY65F5awAiArOjB8Q?key=cFBhSk8zSVJkak9WYS1TRjE2dEhpSTc4VldmNDFn', previewUrl: 'https://lh3.googleusercontent.com/pw/AP1GczOwGY-YaiDOsygIqCGogLh9SonLKBQq1V_1Lcn4gWn6k8Yi-Qf89wzDraoOhHwEFCo1nD6OZJuFyrr2PQtk11e2q3LuDyxpuJr3_7F7mVMtMX3Ll8Ed=w600-h315-p-k', year: '2025' },
+  { id: 7, title: '2025.07.06 - Каяк', date: '2025-07-06', addedDate: '2025-07-06', url: 'https://photos.google.com/share/AF1QipMYrnZCgCUiRJcwmlqxI8TBGV7p_JP9_m-DCb1du83FUQ4ja4ZYA7WZvhoULxh3Rw?key=QW02UmdjUWk3UWl6V3Z5a3czQ0pSOE9VM2NHNkRR', previewUrl: 'https://lh3.googleusercontent.com/pw/AP1GczPhzJ33tg3ncbgObkQ414wpsWpNAXHtI42XYYElvHF2eXKmrMG5JABG-8iciNgfosSM_egVSGdB2EUndRBpOzwN5UiwvhkLRYCVV0Lk9UXka6tSbLgq=w600-h315-p-k', year: '2025' },
+  { id: 8, title: '2025.01-06 - Январь-июнь', date: '2025-06-29', addedDate: '2025-06-29', url: 'https://photos.google.com/share/AF1QipN5VJ2pq_bl2WgQtWeK7dEjJuBWCDgvl32w3_WPOini78-tQaXJNjhUsBsdxwYryA?key=OThKWDZJWjZqYWEzbllVXzdUY2I0TkFtY3htdzln', previewUrl: 'https://lh3.googleusercontent.com/pw/AP1GczMRwe17WUYeF6Kt2xkIGZjLJRtHHtxxUtAQxNJUzN1HIT-2ZeiGWVmDsLA_9eFi5CKgk2qu7Ch6WQbZmqtjQ1rrFzg-D7xkxE5YxkI3K1JbaYeKILBB=w600-h315-p-k', year: '2025' },
+  { id: 9, title: '2025.06.13 - Arsenii graduating', date: '2025-06-13', addedDate: '2025-06-13', url: 'https://photos.google.com/share/AF1QipOa-8dyQwt5zpyxbH3RCQCQE-r7Q-4nDYJGjysV8SoXp3gKdTDV5B7EuQxZxrAgNw?key=X3FOcHNmYWVOU1FDUVUwazZlVFYwdEpDUTd5R3ln', previewUrl: 'https://lh3.googleusercontent.com/pw/AP1GczP8mCuppkICIefK_F8rind4L4_VPo4JxnO5zBA0Bczm7dpu0L2i5JHm-3dH_xG-1LTkHkrX849tVnZk9dNvZDNVYwePMf5zmN7LJsUxoKYcaRkquXSf=w600-h315-p-k', year: '2025' },
+  { id: 10, title: '2025.06.07 - Фестиваль старины в Vaudreuil-Dorion', date: '2025-06-08', addedDate: '2025-06-08', url: 'https://photos.google.com/share/AF1QipOLtFi2rgHA1rZUjcTufoVxWbbfA5UnLzmrpEoOHKVW3bMXq0c0r2nFQOYZJ1m9wg?key=M1Y0TkRFa2V3eEUyTlFRSEhJVlNwTXZSb1lpYml3', previewUrl: 'https://lh3.googleusercontent.com/pw/AP1GczODcpIFmOdwKskVlJZ7gVZz36D7-LS-z5wM--Yh5aJaRru21b2EkuV9ShzDGM6ZieyMi9rqzD525ZlN4jdIRMFYgYnW4G8P_PtgcTTeVg_NXIcGf-iq=w600-h315-p-k', year: '2025' },
+  { id: 11, title: '2025.03.19 - Disturbed, Three Days Grace, Sevenfold', date: '2025-03-19', addedDate: '2025-03-19', url: 'https://photos.google.com/share/AF1QipOwkX2sqo0Gsr89h5mY1CPCO0PAeK38G9geX7aRTiWebSFFUIuvSgNWamSYNj0STg?key=cmhOS3VJUllmeTM3TmN1cTVRNGlwNmJyVk5Sb1pR', previewUrl: 'https://lh3.googleusercontent.com/pw/AP1GczNaB3iIXKwppQ1tbozVH98MUwFXdPWZW6MDn2Gg2BxpyrpQtjIDAwkKfDkMRRRyHp7DJaKvVLWzOXpq0Brt6_dETZCEPZyT-ac0qIEoDGuPl9NWAOCF=w600-h315-p-k', year: '2025' },
+  { id: 12, title: '2025.02.12 - Apocalyptica, Nita Strauss', date: '2025-02-12', addedDate: '2025-02-12', url: 'https://photos.google.com/share/AF1QipOQqEbV8AvxQgSdtdamlCEWWABJ9eFjPw5zg4XKfPxIjgRdCedpLYNOt3EyI344FA?key=cS0xaXo1cXVCemJjQ09QcHZyRmg4WmRzQWFKVUdB', previewUrl: 'https://lh3.googleusercontent.com/pw/AP1GczOOAHgIFaFie4VuzuM6dU-lp0j-c86gUz1FXKCLlh2KKH2GWPTHffTDvtUyLO0CLvLtCRB_EmcQIdNhD0dS82ylz_dFXUn24I7-p0i5uFt-0adIi-8i=w600-h315-p-k', year: '2025' },
+  { id: 13, title: '2024.11.21-24 - Regina', date: '2024-11-24', addedDate: '2024-11-24', url: 'https://photos.google.com/share/AF1QipOpk7ONVQYIjQDa7MKHJ391jq0kjQnOZTV5k3qJWK2SGyrNRlbjTluI3WtJnqdv3w?key=WlU0cDI2a0NwZG9ROTNqRUp4SnRPMC1XSmRWY2Rn', previewUrl: 'https://lh3.googleusercontent.com/pw/AP1GczMW9REYoyVKEW63BaRuGm5JqXWHEfvo9s4ovzn_Ff5_iiXFY9zUz_UCFBdxIp5zfM8eSF-dD0RnBPDd3kpJQR9Vq8OAGXbSxgPy4rqUB5TBgXJewG82=w600-h315-p-k', year: '2024' },
+  { id: 14, title: '2024.11.24 - Royal Saskatchewan Museum', date: '2024-11-24', addedDate: '2024-11-24', url: 'https://photos.google.com/share/AF1QipOO6vujvv3XEUUiCKcT7JhwuDXLW1Aj3rzUoZG8k9qHmIX5hZvLfSPdkFqZWd-x_g?key=blRNRHNOSkhRSUJkTXVxbGVSX1dDVDAzcjVfclJB', previewUrl: 'https://lh3.googleusercontent.com/pw/AP1GczPtfch0uaVqAvNFAy1xxpwNxMZTBQtkJnty9OGSsktllh7uyuwqmWmLjlTnyK87YgqhdoWYE7uYByyj-aNhIAWiI7l_WigLn2m-iSoTwDiVtf-xlf9G=w600-h315-p-k', year: '2024' },
+  { id: 15, title: '2024.11.16 - Matviy\'s birthday', date: '2024-11-16', addedDate: '2024-11-16', url: 'https://photos.google.com/share/AF1QipM-4pg3DRpbnzI-YiMY-0_DcDP7htDK6yxl2b_kA2rxxoIKce5pIJXaDhpV6fZXHw?key=YVZ6aEc0bldoTWxzbEJybWJScXJCZDJWSXBvanNn', previewUrl: 'https://lh3.googleusercontent.com/pw/AP1GczNgHq5c3BhFup6sZnue29MZDeYhUJYceiQSE1758Hmy04_TP6dYnKD8WitWZqlf4PH7lFgy9Xt8ZgkoCgeyXB5wyR3E8imbActAoQcw-CpLSuIuPWhG=w600-h315-p-k', year: '2024' },
+  { id: 16, title: '2024.10.25-27 - Toronto', date: '2024-10-27', addedDate: '2024-10-27', url: 'https://photos.google.com/share/AF1QipPFl3zS_rKNuWeZbaoZvoXguhx_T40SLG8CK4_DpyFVUhN42AY_IktDwxKWVtkbSw?key=NW1zX29aSjdoV2EzNzUtWWV3VlBUc1VNUEQ0TmJR', previewUrl: 'https://lh3.googleusercontent.com/pw/AP1GczOYvRonJuPW7jQSp2v2vRQC-2NGeN-dqhFYV4P6gVmIX4JP0Xqd7yk_UMwa2KHiNIJ9NAHTZW67KAZSifoH4d71lqlxaKgizhX5O5a0fczPPYpNXhZP=w600-h315-p-k', year: '2024' },
+  { id: 17, title: '2024.10.27 - The Village at Black Creek', date: '2024-10-27', addedDate: '2024-10-27', url: 'https://photos.google.com/share/AF1QipM1nX_mzlHdtgjClu-Gf2WWrCAms5WG0HQ9-lfnmGhPv81mQTmis-BX_qPRpsn0Ug?key=alVSU3JWUlJ2UlB4Z3NmOVRqb084OU9WZGtIbGZR', previewUrl: 'https://lh3.googleusercontent.com/pw/AP1GczPbQHoUlnqxOj_ac6moz2L0A5_cBlsgyEmD3b2SEzOV_jFqUBtt4Ky_SC5dEX-75M_eX7Nz-v5xkFSkhZEigSoxhkFvLpnSzvsjDGn1IaAwYGYmfNNg=w600-h315-p-k', year: '2024' },
+  { id: 18, title: '2024.09.14-15 - Vaudreuil-Dorion 2', date: '2024-09-15', addedDate: '2024-09-15', url: 'https://photos.google.com/share/AF1QipN1q50lCXBJvlUCyqHrTXtqI5FMEpxhoWXzaMKsJJSxeqYbt67-dd3DztOymY2syg?key=ckxWNEtSSldGcDdMeDVoNElOVUsydjJVQlczeGR3', previewUrl: 'https://lh3.googleusercontent.com/pw/AP1GczMENswU729Bpte_TZ3q9HhuYdY4GpyDeuhrvxgJnFX-i2U7w82u4_6FLoZ081kwF4J2Jn2ZQ5_xEmb9UlunFdfiwfyIDCYxsDmTkni5gxEI0wUBnDr6=w600-h315-p-k', year: '2024' },
+  { id: 19, title: '2024.08.23-27 - Vaudreuil-Dorion', date: '2024-08-28', addedDate: '2024-08-28', url: 'https://photos.google.com/share/AF1QipPDjbtO2OKxxtKipdO0Z79IXnGkbl1DC6JSWK946J1speLCJwNg5wUmfMjr8W4bmg?key=TmFma0poRjhfZTVaYWEyRmtkc29nSHhIQnM1em9B', previewUrl: 'https://lh3.googleusercontent.com/pw/AP1GczO52YCRcSfzc4FEq2PQ-LBeizUmmmZkqB_1lunVbZwHkhFuzxCJK6IgG_yFaur9ljd66-aEZ-cEucc-bBIS2P6cNRghDqVkVWrjqNVX137KMzkZg0bm=w600-h315-p-k', year: '2024' },
+  { id: 20, title: '2024.07.25-31 - Montreal', date: '2024-07-31', addedDate: '2024-07-31', url: 'https://photos.google.com/share/AF1QipNOQ5U7dvJrsLtHIMUEBqxkD350uB3HqBfZMnbsejWKNeYCKIJeHqPUCaEq3Ez34Q?key=R19rX2dFMkJYbXNJMXE0bENOOHU5OEZQVGRhc3VB', previewUrl: 'https://lh3.googleusercontent.com/pw/AP1GczPH9mDSGmYAU0RIfndE7NGe170yA9bcp0T7izOUv9ovb7XUqPhjVCtyUhA8H9niOUJWxVeYcuNe7HUCwvSm9ivzdXVdcQf9Q_CDyQhE0hcDGAbStFI6=w600-h315-p-k', year: '2024' },
+  { id: 21, title: '2024.05.19-22 - Гатино, Оттава', date: '2024-05-22', addedDate: '2024-05-22', url: 'https://photos.google.com/share/AF1QipOTKRTzwkPr3jRyl1Zt_H_0j-hMDHOF4Lup57ciMtX7uBPLXfZvnjSrcu2WbNSkQQ?key=VzNtclhKNEVEbGRSUVJ0dll4TERnc0o5eTRzUEFn', previewUrl: 'https://lh3.googleusercontent.com/pw/AP1GczPWnzF5FFXh-cFczClcsW_EuPvHwCqw5aDPYT4QaKQ7dvwkbYxVR4uMGiFXDnRfZ4Nacdztt4iZCPNQ5jlvid8AObNqbxAxgkQAFor1JpQqJyDWlOVP=w600-h315-p-k', year: '2024' },
+  { id: 22, title: '2024.01-02 - Январь-февраль', date: '2024-02-17', addedDate: '2024-02-17', url: 'https://photos.google.com/share/AF1QipMHkKcx6qtRFfWI8PEUnBSgptRQ6Fcw1GvOLIgvL7bktEkCkN1CnX0U8AWXrL5bJQ?key=QTY5UHN0MW9GS1h6eXBkUGJ1cUlSRnNmUjBPY21B', previewUrl: 'https://lh3.googleusercontent.com/pw/AP1GczMETBkdEKqH4gCQ2czh3JqWdCx7MREjb0qXR_A0Mu_bSUJkp8Xm-_6qDE8ZoD6A3hAz7GMNm5DOcyCB8vNsPbYr3R-I9wGoiXsBfLi3fgwihhThY-Hx=w600-h315-p-k', year: '2024' },
+  { id: 23, title: '2024.01.27 - Автосалон-2024', date: '2024-01-27', addedDate: '2024-01-27', url: 'https://photos.google.com/share/AF1QipNUU9VkTaQGDn6IWAbgJgbQiHdo5Km9HRJYBjzEPpQPtnAb_36kwEuEKC-Bb4FqrA?key=OFNrUXhzdk92WEw5RVN2UDlqNk1lMVdKREFtS2FB', previewUrl: 'https://lh3.googleusercontent.com/pw/AP1GczN78Um6RVx7VjWRmGdGGruuqSz3YeCy5cSASv9VkV4A4eHC5wPip0HE-JRQoUFVpSP43IK7DNdLkm67A5LncvB7xy0nAMrs6IVjEnoX5jnhkRywxhFj=w600-h315-p-k', year: '2024' },
+  { id: 24, title: '2023.12.08 - Прогулка в центр Монреаля', date: '2023-12-09', addedDate: '2023-12-09', url: 'https://photos.google.com/share/AF1QipPb3NvNXtjgIvfIzaX531-SDfMUenUah6XmK4R-3ce7ANod7_fdKU0fSqK6wCaQfg?key=SWMzVEU3RDF6dm9KbHk0MzRNTU5VMjczZXo1MG1n', previewUrl: 'https://lh3.googleusercontent.com/pw/AP1GczNLX2fpfaGQm7kN8-Nd_DuVKLnVVsdlljab8T0T2yxEe3iRD6wN20qNI78xrZOwptsUDzPH-1jTzKVnaHsepeXgS-EF5GiduE17anhevIaAt57Iuk1I=w600-h315-p-k', year: '2023' },
+  { id: 25, title: '2023.06-08 - Июнь-август', date: '2023-08-29', addedDate: '2023-08-29', url: 'https://photos.google.com/share/AF1QipNzfQt-fohQvZCM8CoUbE9ae6siJP6EuLY2y095Dy4SNB3XhOPMsJiurjFJq-T3vA?key=d0ZHTEVjeUNPckRSYkIxRVJ4ZnVVZVdpa1o0dXpR', previewUrl: 'https://lh3.googleusercontent.com/pw/AP1GczNo2iwukWjKufuyEZTcXf_uZWk2gGUetjB2uUtumVbGttZF6G6G0xJiZ-4JaWOU4FqAVZbHEQ7CAim-mnjSvik7C86xI8gwY6wELM4dB8c3Z31iC23r=w600-h315-p-k', year: '2023' },
+  { id: 26, title: '2023.08.13 - Музей иллюзий', date: '2023-08-13', addedDate: '2023-08-13', url: 'https://photos.google.com/share/AF1QipMC5v_yFET6QZSNKV-Jbbm_tilBqbEGrWNQbqfm3Q0yAvqbu0e14DVYf_Q3HDxRUQ?key=Ui03RDhVX3ZteDVqRVBMSVlMNzljRmpRd2E3NXhB', previewUrl: 'https://lh3.googleusercontent.com/pw/AP1GczPkuwl_eyZcPToOx0GlGfTa5ALIbYWB8IzQJSCU80Yary8ApRbFbo0OLnpP-r70N8bWxb5oBP1YemavUIPJEwq_m1LZ80-rixWojXLt-tiTe2k8qAAu=w600-h315-p-k', year: '2023' },
+  { id: 27, title: '2023.08.04-07 - Кемпинг на Ляк Симон', date: '2023-08-06', addedDate: '2023-08-06', url: 'https://photos.google.com/share/AF1QipNKhpoPrZyR5gP0aqENij8Lpzt9ltsc55bNjzRrwLeIr0_-kFqVqUAkVOcgXbwlOQ?key=WkxxdzVDOGYyaE5nek9WSnRncWQxUWNLMThDLVZn', previewUrl: 'https://lh3.googleusercontent.com/pw/AP1GczNCk15hk7ovQXpuhSSOTBdEtYSC60BUwrFWQhRYSQ91RopBSA09dxPFnOwR1vAiEbZy_LE55oBOuDxy_hKH5mdKEc2SwBK6SQXCHJJ1m8oBxWiNHnEw=w600-h315-p-k', year: '2023' },
+  { id: 28, title: '2023.06.30-07.03 - Кемпинг на Ляк ля Пеш', date: '2023-07-03', addedDate: '2023-07-03', url: 'https://photos.google.com/share/AF1QipOZheCT9XVuxn1nswHJt17QycErxCT5G6OrKbKW1MFK7oAXTG1tXgm-vfH8Dk87Kw?key=cEJselhjTENzSkt2bUxFclpLRjNBT3ZoUVJZUUpR', previewUrl: 'https://lh3.googleusercontent.com/pw/AP1GczOxSWdVkZlsh9El1OvhfCeriaQukFsh1e9Pr09wIjIunYd2xZ4zt3mB87JXMAwniZ22L1w2YDIjBEfahaob3qv_okr4w_1NAnHs_ggcF9Uz_IVtf_b6=w600-h315-p-k', year: '2023' },
+  { id: 29, title: '2023.06.23-24 - День Квебека', date: '2023-06-24', addedDate: '2023-06-24', url: 'https://photos.google.com/share/AF1QipN4g61Jp7y_Hu9m3cTgDXNLK6C_1b98_GNQficxlwG-syoKaVSmoBmQ0o_M7JASsQ?key=NFRtZi1lYk16UFBEeUY2M2stRUJ5Z1lIaHN6c2lB', previewUrl: 'https://lh3.googleusercontent.com/pw/AP1GczNSoyw73YMXepHKWIGWgqmuPbEanQZ2_g-SXPD0y9g8waGi7qJmIfphjsbkn75RNYX1LiWAPXkmdI9jm6gs5iFOjfxDmdx7WFLoluFZIsLiyC7nuSP7=w600-h315-p-k', year: '2023' },
+  { id: 30, title: '2023.03-05 - Март-май', date: '2023-05-31', addedDate: '2023-05-31', url: 'https://photos.google.com/share/AF1QipPXU0Xktu6W5wlTbvtop4XTVXf5DKNSxlunVW23kuGWGRKO-9gBxaKfjc0UyuMK6A?key=STc0LUtDMWNZSTVYdFhrUDVVdElUX01nSUowSTFB', previewUrl: 'https://lh3.googleusercontent.com/pw/AP1GczPhZNSUZN0bwr2uGVTkji3CF-FfxIRe1YaxeQ0elkAJLFSnTXWWsXeiKSnKIIK1SY20uYLGw2T8u8uLDwfSd_n8RgyxIy9K6IsAp7kJNY3nhs_ROLl_=w600-h315-p-k', year: '2023' },
+  { id: 31, title: '2023.05.14 - Оттава, фестиваль тюльпанов', date: '2023-05-14', addedDate: '2023-05-14', url: 'https://photos.google.com/share/AF1QipPGLtgKX9IJHuMeZteC7NEqCMaWkfotA7msRrIQgQlhKQZSoSZqyUIKgVrCZPG53w?key=ajFQdjNTR0hsZzh1MTZPQXdoZlBOOGM0b1dZelVn', previewUrl: 'https://lh3.googleusercontent.com/pw/AP1GczPiJpJ4zocvG5VBScZIoXARmssMP80t3WdKzjGWM1GfJwx-gE9k1T1OmsFqhD6A56w0ZalYY1dj5AiJ8O2aavcY7suRFyNheq_p6PAWxGD33SJ5S_C4=w600-h315-p-k', year: '2023' },
+  { id: 32, title: '2023.03.11 - Сан-Совёр, горки', date: '2023-03-11', addedDate: '2023-03-11', url: 'https://photos.google.com/share/AF1QipNEyxm1q_AU6w0E1YbEk5QYv0owz7QrIJkSSz6688JLMdMOHKYRGe7XdJHNusvC6w?key=dkpweUlPYmhfYnpnY2Z0cFRlQkkwVHVWMUw3ZFh3', previewUrl: 'https://lh3.googleusercontent.com/pw/AP1GczOPIRNygs-u_Mb86QCN1MreP2KR1igb8rHufy0y88pVdheh3NL4NY5ijTW5bnb_qaEFpUtO9KLCVIYLH_hWRd8ex-CzfCTyl6Q44rqH45iWuF9TqBJ3=w600-h315-p-k', year: '2023' },
+  { id: 33, title: '2023.01.22 - Автосалон-2023', date: '2023-01-21', addedDate: '2023-01-21', url: 'https://photos.google.com/share/AF1QipNLyZkvsQTfGh_o0VX9dJnkpFnRcMG5opC0Psvb36CsDSCoQCbWNB-o7eErui48Hw?key=dTNDUW1FQnhnc1BEaHpGSm9nS2ROU3hVMFZ4VmFR', previewUrl: 'https://lh3.googleusercontent.com/pw/AP1GczOazKelQ71xjWYawehZNAFAsY5xP8-ZD4JrWCtTuVhKH7vxf3AyeFrSzzQwTArZJ1BTbJC6Cinb2g5jKuFQhXIdXHMeej3Ha1Z-XLQ1tO3WyqOxSWpz=w600-h315-p-k', year: '2023' },
+  { id: 34, title: '2022.12.08-19 - Круиз Маями-Аруба-Кюрасао-Лабади-Маями', date: '2022-12-19', addedDate: '2022-12-19', url: 'https://photos.google.com/share/AF1QipNnhD2S0JwsmvS98FyfVIN-bjv87D20nRo8fbvcm_UIldQMnE-c4JyDAwnFqNZWEA?key=Tk50cW9Bcm81bkUwbUdiUHhUbHM1Y2N6WkNTLWVn', previewUrl: 'https://lh3.googleusercontent.com/pw/AP1GczP78dP6G5GYK-IyaNxtLKXWcgOpcpJ0HEiS2Lx9qbfjiQvk8bnBIWa14-kbJN5ZREnyUSmJV-tJSO_MTju-RmKv-7k4uvLqoW8w3jzZtMooa36S4iVW=w600-h315-p-k', year: '2022' },
+  { id: 35, title: '2022.09-12 - Сентябрь-декабрь', date: '2022-12-03', addedDate: '2022-12-03', url: 'https://photos.google.com/share/AF1QipPDBZ2ogio4CCPq0dm9Hg9UgDsZ_nZNwG-ZOWvbjnfqyggbXLc8V6k2br2wz6jsUw?key=QllVdzBrNW01WTFmRDRyUDFzaHlwekxPVS1fVlF3', previewUrl: 'https://lh3.googleusercontent.com/pw/AP1GczPvM3-I8_3cyOqAZ-kMOSYp2dKP9C8-mFLauplH2lLa0XpDOaVCAt022XBAFsKviym3hpNdtfShbQNA905cAQrKcD7cV_2o_sc0wJzESjclhJNovRV1=w600-h315-p-k', year: '2022' },
+  { id: 36, title: '2022.11.20 - Three Days Grace', date: '2022-11-20', addedDate: '2022-11-20', url: 'https://photos.google.com/share/AF1QipNpkvNnmnLW1IedNGOXMih05FTCYg2IzidqicqsynEcIskeltIPbnFm1s-hciforg?key=THdSb0EwMldnTlFxUlVBOElZMHdNcmpBdDBJWGp3', previewUrl: 'https://lh3.googleusercontent.com/pw/AP1GczOZWwbOAx59Z6Ei3nj-NaAKwr4ORiPE3O4dw_zK7vc72ywWynh2Y3tbm5EYFNgcbvty9gDZ7LY_YfFkEmUAF6YMB1DlWHi4ze1xzMtE23JvuKnePRKX=w600-h315-p-k', year: '2022' },
+  { id: 37, title: '2022.09.10 - Украинский фестиваль в Монреале', date: '2022-09-10', addedDate: '2022-09-10', url: 'https://photos.google.com/share/AF1QipPMEIfuupWeZXkVhYblTNWi2kKMB5pIn5CSZsTmJJgg8yehD5mqbg3h8qT2MhVETg?key=R0FDVUJFUUdKUmQzSlRWaGNmUDFZVmM5WjlhR3FR', previewUrl: 'https://lh3.googleusercontent.com/pw/AP1GczO0vfvwUEbPZXN-m6JjA0JhcTQwbnErHBcGNyoTc2XZietKB-QVtXGHqgy8Qg2vqCbPS_ZUYfWKV7bwR-YitolDJfq8EswJIIwBzuvBo7XYSiFBvG7a=w600-h315-p-k', year: '2022' },
+  { id: 38, title: '2022.08.20-22 -Кемпинг на Ляк Симон', date: '2022-08-22', addedDate: '2022-08-22', url: 'https://photos.google.com/share/AF1QipMIO8SMloa_g1iZGTmWueJw0ms0Wlr1xosMt7tB9pE8-tFpnBPl7gjl7WmTwgIrDw?key=eVVWUVlOTWpIMUJ5bjBpbXZkR0hZSDNNYTBNRTRB', previewUrl: 'https://lh3.googleusercontent.com/pw/AP1GczNzy2qQEokjjUAXmb53O3g0CoGFB4wZJvm2YS_Sqyrv25gPlIkXedxx7MyB3Ei3thN7Ejxf18st5gasBY0MxSs0NGmD1NXh--ImmDiinsX76AKf9fd_=w600-h315-p-k', year: '2022' },
+  { id: 39, title: '2022.08.13 - Берлингтон', date: '2022-08-13', addedDate: '2022-08-13', url: 'https://photos.google.com/share/AF1QipNbhNcyS3SKyRt4L6jDDq3FOG_voRznQFle72kGyas4CEQXSshnx5Kg812HslAxKQ?key=bmRkTHBKQ2UwZTJBSGxjUkh0Nm9JTGJWbFZJYjVB', previewUrl: 'https://lh3.googleusercontent.com/pw/AP1GczPQTc18R_U-BV_BWGRLJPQZtKQB96ObHl6AHdI6m0BfwxWZ-nhMAUsXnjs3-jLVPSMwX8Vb2aE76IhIOKUsEeDR1wBhcnef1a3KNoAWrWJHVrnjRMr_=w600-h315-p-k', year: '2022' },
+  { id: 40, title: '2022.06-08 - Июнь-август', date: '2022-08-12', addedDate: '2022-08-12', url: 'https://photos.google.com/share/AF1QipMVbdQv_QMSaMq_-u7ajHVbBxhGvFJDGf35G6YwBVC6x0P9cYwWt3THBkbcdlxeIw?key=QUR5RXM3Tk16c3ZZTXhDdk5GX2NXV2gzeThxVk9R', previewUrl: 'https://lh3.googleusercontent.com/pw/AP1GczN_lPx3iskHj5QhuEA2pcexNbss0sDKWwiCZEG7E46AaDdTqCZKKAiuPbdh41cHyuI5QUkEZM7ry_xScHTPdq35Fhvvb7iq3_ME8OKQpa5fcS-lH-g0=w600-h315-p-k', year: '2022' },
+  { id: 41, title: '2022.08.05-07 - Кемпинг на Ляк Монро', date: '2022-08-07', addedDate: '2022-08-07', url: 'https://photos.google.com/share/AF1QipOvsapnETdfB9Ryf--MEh-AGDskoKfuoZaLfm5YgLHTmm0iCrwjCE3avYQAo0O0JA?key=RFM0TkRFdFJPMzJOblNGeDN3SEhHR21Xb1h2dHlR', previewUrl: 'https://lh3.googleusercontent.com/pw/AP1GczME4jQcvl1Q3EoUa2zN0VFj0Tjqcvc8k-Wk2rnsr4mfPfEGMcCDlsk10V7_9mKndiBXrlPQ73EeKNRHXcHaTzxuRWWLnVQfrT3yVDK9KiHaiCB4H_yf=w600-h315-p-k', year: '2022' },
+  { id: 42, title: '2022.07.29-30 - Гатино, Оттава', date: '2022-07-30', addedDate: '2022-07-30', url: 'https://photos.google.com/share/AF1QipPSG3zDHcODfvoS3xFkZjJRCWMKYys1R-Xz0OzmVHXHHG-4_IMlTszuBxzJWebhMA?key=ZGxiQkhQNkx4S3RNRGJLdmNyU0RldFBNMVJ6a05n', previewUrl: 'https://lh3.googleusercontent.com/pw/AP1GczPDKShj5U7awYUgczl3fAiChYMrD6XILdge1KENN8nx2KtCmY06twwyfmeUJHN8uiuP4OnXlEYBS12MBDjOt9vP0EtnCBgncICgTMuDV-m8N9n-3bWe=w600-h315-p-k', year: '2022' },
+  { id: 43, title: '2022.07.23 - Хантингтон, каяки', date: '2022-07-23', addedDate: '2022-07-23', url: 'https://photos.google.com/share/AF1QipOkmzY6hFeax_R3KPshCuHPyjHH__p7lCS8GdDH9f9wRpCsioba-2bjdjv5id1BbQ?key=bGVobjZSRFkyX285M3ZQLTItUTZ2SjdCYXNpUVJB', previewUrl: 'https://lh3.googleusercontent.com/pw/AP1GczNNaJ4FBDlhd3I9yAx5vNsiOYkkTa3r-SYxUcU9Bz5gb3Jvao19qvsITJIBUT-vqt8GUd_9eniXsxUo-Q_C0cISJmmKVVZqjWfpxabg7pBsJR74XKy0=w600-h315-p-k', year: '2022' },
+  { id: 44, title: '2022.07.17 - Автошоу на Иль Перро', date: '2022-07-17', addedDate: '2022-07-17', url: 'https://photos.google.com/share/AF1QipPHkzfKuvf-ZO1OjEMQuhZMduNVh7dNJTUIiT6WSVeFZ4Ae0D6QrIPoGZTtFYFfng?key=UnowTHl4VkI2bTVLQmVlQkxaX21Da19SLUhsZVd3', previewUrl: 'https://lh3.googleusercontent.com/pw/AP1GczMB03vUXmRY4XsvR5nil9QNig2IcPwyNlZ18GXKVJMpYW2WODpjfPGlWjGeynIuBbxJ60121r-cM0B-DYUaKizJJM7T0PK3tN48hrgt_BHRjXmcK0Iq=w600-h315-p-k', year: '2022' },
+  { id: 45, title: '2022.07.09 - Каньон Осейбл Часм', date: '2022-07-09', addedDate: '2022-07-09', url: 'https://photos.google.com/share/AF1QipNwPnxUnipu144Szjr9ZJl6mEgCfbWqunxmUy0xobJ-KpcTGOub_1797QeZAszfaQ?key=RTVKajRtU3VFY0hIMzloc0l2emNpNkdSdHlRTk1n', previewUrl: 'https://lh3.googleusercontent.com/pw/AP1GczM0r1QY17XEQF7Z8BWCDTqFd4OhvTMTKAo0Glza48pRudS_VB-s_xZeVAWRvWQbU-c9rhDBvEDTWIDsJhB7pIpnD5Ucv5Tf-ijSNpAVE7gqIuiG5Omb=w600-h315-p-k', year: '2022' },
+  { id: 46, title: '2022.06.24-27 - Кемпинг на Ляк Фронтенак', date: '2022-06-26', addedDate: '2022-06-26', url: 'https://photos.google.com/share/AF1QipNGrNodWNd54EZaBHCYm43vWQga6oeP-iIpAv0gWJcNZkJdCSZ9gRscXscyvna9yg?key=bHVIMkZTaTUwd3RSMVN0Q1VCYjFwd1BjZjhjYUdn', previewUrl: 'https://lh3.googleusercontent.com/pw/AP1GczNgYdzzyzLXbcniksXmMT2qZ0IMtWoPBJQv_jHyc-1OGGOIAlrUoCJ2_Z4QBaxVdEWLpk6OK3i1Ssa6DWYSZf0cq94WwdI_JhXh0L-NNAs-am0q1F1Q=w600-h315-p-k', year: '2022' },
+  { id: 47, title: '2022.06.18 - Фореста Люмина', date: '2022-06-18', addedDate: '2022-06-18', url: 'https://photos.google.com/share/AF1QipNFRDotFEcEUBnsiMjptKm9AQ7sxRetza5SU_ZwYj8sONbKUORTJtRG-sM7dFYHqg?key=RC1FTG5RT1BaVWFDMUtYMnNETk5Ma1hJa3VDMlVn', previewUrl: 'https://lh3.googleusercontent.com/pw/AP1GczOqvBPG-27Y9OdbNz1w6u4viRvigElxbmEQHZeKxIHbEmEOM-Wn8WgSvwlxbUGD9FSATvVKfKlFWMj9RTbUhc77pKMO9l-trR9BIYmA-tYPbxDw_lCI=w600-h315-p-k', year: '2022' },
+  { id: 48, title: '2022.03-05 - Март, апрель, май', date: '2022-05-31', addedDate: '2022-05-31', url: 'https://photos.google.com/share/AF1QipO38vjGwMAzXnrSGX2nTTWn8IlBY6GlOvjUySwacgDuuTczpYusfYedtT7_Gi4-GQ?key=U25uWHJsT19Cel9vb3lpNUpKci1rMWp5enpOU2hn', previewUrl: 'https://lh3.googleusercontent.com/pw/AP1GczP_uTTJ5eLL5boSbXkpZqn4eRPPEYndOv7aFH_7CB3MXUV8KjrYQvDMSluLIhOKupm3x6w7Pqz3QZDB1BV3O3OA_9Kk8uvajqOZS0_RPIA647GX2t-9=w600-h315-p-k', year: '2022' },
+  { id: 49, title: '2022.05.13-15 - Роудон, шале', date: '2022-05-15', addedDate: '2022-05-15', url: 'https://photos.google.com/share/AF1QipPLoBzzEh5St1ypACDvTWruYhZovAQQur3r7C8dhAxhWuphdm3GZEBzhhCRklhJOA?key=dW9wXzhCY2g2QUFvcDhXdllhd1g1X0pGMHNyajl3', previewUrl: 'https://lh3.googleusercontent.com/pw/AP1GczPqfFD9DJRYyh3X8HP98mKqt2v3lKr44dn17djIgmrdwCsLYJvIqlOFrJ_HqN7G6MuuBEcaermDF68lfOLp-s6FxT2r_02OIc-1IBe1XdIIdQhdFr4L=w600-h315-p-k', year: '2022' },
+  { id: 50, title: '2022.05.04 - Apocalyptica, Lacuna Coil', date: '2022-05-04', addedDate: '2022-05-04', url: 'https://photos.google.com/share/AF1QipNq_hMzl72g-VhWNvr1mPuvem3A8GMzgR-iYrUnvvnWPrC0WmW3sAKzjNFRCH6Rnw?key=eXZaV25FM05oWmFtMy00NWd1M3l4WkpDbHlmbktB', previewUrl: 'https://lh3.googleusercontent.com/pw/AP1GczOlqJYnRsEjDepIAsq9iF3Qw71C8tlN1zjasp_SXTmLsGztUowipcmSga4sl2uIxXd97Qt4M8edvuSErMgH9D6Wbio9iYRwGN9WyXLlXxkw6ys158ce=w600-h315-p-k', year: '2022' },
+  { id: 51, title: '2021.07.12-17 - Кемпинг Сандбанкс', date: '2021-07-17', addedDate: '2021-07-17', url: 'https://photos.google.com/share/AF1QipMkz3KmcEOgDYy2b2ufh_XjaIBXGzloS7JZjaT8Z7m4wVeHXbECX2wDjf9h5xNvPQ?key=aklpM2JnSkNLOXJzNzVsUUgtYThsem82VGMwOWx3', previewUrl: 'https://lh3.googleusercontent.com/pw/AP1GczPb6wecQ0jhOLPlmYbeyeCzyVaNleKqeIwqi1mJV-fb9kjDMT6PW1T8W7ynCh8f-PHRN8cwrtaotBA724QppQoyf5-n9Oxg8s0EwdqpaM909xF7ZWUR=w600-h315-p-k', year: '2021' }
+];
+
+// Проверка, является ли альбом недавно добавленным (последние 30 дней)
+function isRecentlyAdded(addedDateString) {
+    // Используем строку как есть (она должна быть в формате YYYY-MM-DD)
+    const normalizedDateString = addedDateString; 
+    
+    // Проверяем, что это полная дата (длина YYYY-MM-DD = 10 символов), 
+    // чтобы исключить диапазоны (например, '2025.01-06') или неполные даты.
+    if (normalizedDateString.length !== 10) {
+        return false;
+    }
+    
+    const addedDate = new Date(normalizedDateString);
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 30);
+    
+    // Проверяем, что addedDate является валидной датой (не Invalid Date)
+    // и что addedDate больше, чем sevenDaysAgo
+    return !isNaN(addedDate) && addedDate > sevenDaysAgo;
+}
+        
+        // *** Добавление констант для ключей localStorage ***
+        const SEARCH_STORAGE_KEY = 'searchTerm'; 
+        const YEAR_STORAGE_KEY = 'yearFilter'; 
+        const SORT_STORAGE_KEY = 'sortMode'; 
+
+        // === Глобальные переменные ===
+        let currentYearFilter = 'all'; // Год, по которому фильтруем
+        let currentSort = 'newest'; // Режим сортировки
+
+        // === Получение элементов DOM ===
+        const filtersContainer = document.getElementById('year-filters');
+        const menuContent = document.getElementById('menu-content');
+        const menuButton = document.getElementById('menu-button');
+        const menuDropdown = document.querySelector('.menu-dropdown');
+        const sortButton = document.getElementById('sort-button');
+        const sortContent = document.getElementById('sort-content');
+        const sortLabel = document.getElementById('sort-label');
+        const sortIcon = document.getElementById('sort-icon');
+        const searchInput = document.getElementById('search-input');
+        const clearButton = document.getElementById('clear-search-button');
+        const themeToggle = document.getElementById('theme-toggle');
+        const searchContainer = document.getElementById('search-container');
+
+
+        // === Вспомогательные функции ===
+
+        // Создание HTML-карточки альбома
+        function createAlbumCard(album) {
+            const card = document.createElement('div');
+            card.className = 'album-card';
+            
+            const link = document.createElement('a');
+            link.href = album.url;
+            link.className = 'album-card-link';
+            const preview = document.createElement('div');
+            preview.className = 'album-preview';
+            preview.style.backgroundImage = `url('${album.previewUrl}')`;
+
+	    // --- ДОБАВЛЕНИЕ ЗНАЧКА "НОВОЕ" ---
+            if (isRecentlyAdded(album.addedDate)) {
+                const newBadge = document.createElement('div');
+                newBadge.className = 'new-badge';
+                // Голубой колокольчик в темном/светлом кружке
+                newBadge.innerHTML = '<span class="material-icons">notifications</span>'; 
+                preview.appendChild(newBadge);
+            }
+            // ---------------------------------
+
+            const info = document.createElement('div');
+            info.className = 'album-info';
+
+            const title = document.createElement('div');
+            title.className = 'album-title';
+            title.textContent = album.title;
+
+            info.appendChild(title);
+            link.appendChild(preview);
+            link.appendChild(info);
+            card.appendChild(link);
+
+            return card;
+        }
+
+        // Обновление иконки и текста на кнопке сортировки
+        function updateSortButton(sortMode) {
+            const sortIconsMap = {
+                newest: { icon: 'arrow_downward', label: 'Самые новые' },
+                oldest: { icon: 'arrow_upward', label: 'Самые старые' },
+                added: { icon: 'notifications', label: 'Недавно добавленные' }
+            };
+            const mode = sortIconsMap[sortMode] || sortIconsMap.newest;
+            
+            sortIcon.textContent = mode.icon;
+            sortLabel.textContent = mode.label;
+        }
+
+        // Логика сортировки
+        function sortAlbums(albumList, sortMode) {
+            const sorted = [...albumList];
+            switch (sortMode) {
+                case 'newest':
+                    // Самые новые (по дате альбома: descend)
+                    sorted.sort((a, b) => b.date.localeCompare(a.date));
+                    break;
+                case 'oldest':
+                    // Самые старые (по дате альбома: ascend)
+                    sorted.sort((a, b) => a.date.localeCompare(b.date));
+                    break;
+                case 'added':
+                    // Недавно добавленные (по дате добавления: descend)
+                    sorted.sort((a, b) => b.addedDate.localeCompare(a.addedDate));
+                    break;
+                default:
+                    // Самые новые (по дате альбома: descend)
+                    sorted.sort((a, b) => b.date.localeCompare(a.date));
+                    break;
+            }
+            return sorted;
+        }
+
+        // === Функция Отрисовки Альбомов ===
+        // Удаление параметра searchTerm и чтение из searchInput.value ***
+        function renderAlbums(filterYear = currentYearFilter) {
+            const searchTerm = searchInput.value; // Получаем поисковый запрос из поля ввода
+            const grid = document.getElementById('album-grid');
+            grid.innerHTML = '';
+            
+            let filteredAlbums = sortAlbums(albums, currentSort); 
+
+            if (filterYear !== 'all') {
+                filteredAlbums = filteredAlbums.filter(album => album.year === filterYear);
+            }
+            
+            // Фильтруем по поисковому запросу из поля ввода
+            if (searchTerm) {
+                const query = searchTerm.toLowerCase();
+                filteredAlbums = filteredAlbums.filter(album => album.title.toLowerCase().includes(query) );
+            }
+
+            if (filteredAlbums.length > 0) {
+                filteredAlbums.forEach(album => {
+                    grid.appendChild(createAlbumCard(album));
+                });
+            } else {
+                grid.innerHTML = `<p style="text-align: center; width: 100%; color: var(--color-text);">Нет альбомов, соответствующих вашему запросу.</p>`;
+            }
+
+            // Обновление активного класса на фильтрах в шапке
+            document.querySelectorAll('.filter-link').forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('data-year') === filterYear) {
+                    link.classList.add('active');
+                }
+            });
+
+            // Обновление активного класса на фильтрах в меню
+            document.querySelectorAll('.menu-content-item').forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('data-year') === filterYear) {
+                    item.classList.add('active');
+                }
+            });
+
+            // Обновление активного класса в меню сортировки
+            document.querySelectorAll('.sort-content-item').forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('data-sort') === currentSort) {
+                    item.classList.add('active');
+                }
+            });
+        } 
+        
+        // === Фильтрация по Поиску ===
+        // Использование SEARCH_STORAGE_KEY и вызов renderAlbums без searchTerm ***
+        function filterAlbums() {
+            const searchTerm = searchInput.value;
+            localStorage.setItem(SEARCH_STORAGE_KEY, searchTerm);
+            if (searchTerm.length > 0) {
+                clearButton.style.display = 'block';
+            } else {
+                clearButton.style.display = 'none';
+            }
+            renderAlbums(currentYearFilter); 
+        }
+// === Инициализация Фильтров Годов (Адаптивное скрытие) ===
+    function initYearFilters() {
+        const years = ['2025', '2024', '2023', '2022', '2021', '2020', '2019', '2018', '2017', '2016', '2015', '2014', '2013', '2012', '2011', '2010', '2009', '2008'];
+
+        // Создает элемент фильтра
+        const createFilterLink = (text, year, isMenu = false) => {
+            const link = document.createElement('a');
+            // Если в меню - класс пункта меню, если в шапке - класс фильтра
+            link.className = isMenu ? 'menu-content-item' : 'filter-link';
+            link.textContent = text;
+            link.setAttribute('data-year', year);
+            
+            // Если создаем для меню и этот год сейчас активен - добавляем active
+            if (isMenu && currentYearFilter === year) {
+                link.classList.add('active');
+            }
+
+            link.onclick = (e) => {
+                e.stopPropagation();
+                currentYearFilter = year;
+                localStorage.setItem(YEAR_STORAGE_KEY, year);
+                renderAlbums();
+                menuContent.classList.remove('show');
+            };
+            return link;
+        };
+
+        // Очистка и первичное заполнение контейнера
+        filtersContainer.innerHTML = '';
+        
+        // 1. Добавляем "Все"
+        const allAlbumsLink = createFilterLink('Все', 'all');
+        if (currentYearFilter === 'all') allAlbumsLink.classList.add('active');
+        filtersContainer.appendChild(allAlbumsLink);
+
+        // 2. Добавляем годы
+        years.forEach(year => {
+            const yearLink = createFilterLink(year, year);
+            if (currentYearFilter === year) yearLink.classList.add('active');
+            filtersContainer.appendChild(yearLink);
+        });
+
+        // Логика адаптивного скрытия
+        function updateFiltersVisibility() {
+            // Очищаем меню перед пересчетом
+            menuContent.innerHTML = '';
+            
+            const isMobile = window.matchMedia('(max-width: 750px)').matches;
+            
+            const headerWidth = filtersContainer.offsetWidth; // Доступная ширина контейнера фильтров
+            let currentUsedWidth = 0;
+            
+            // Ширина одного элемента (56px ширина + 8px margin) = 64px
+            const itemFullWidth = 64; 
+            
+            // Запас места под кнопку меню (гамбургер)
+            const menuButtonSpace = 8;
+
+            const allFilterElements = Array.from(filtersContainer.children);
+            let hiddenCount = 0;
+            
+            // === ИСПРАВЛЕНИЕ ===
+            // Флаг: если true, значит место закончилось и все остальные элементы 
+            // принудительно отправляем в меню, не проверяя ширину.
+            let forceMenu = false; 
+
+            // Перебираем ВСЕ элементы
+            for (let i = 0; i < allFilterElements.length; i++) {
+                const el = allFilterElements[i];
+                const text = el.textContent;
+                const yearVal = el.getAttribute('data-year');
+                
+                // Если это последний элемент в списке
+                const isLastElement = (i === allFilterElements.length - 1);
+                
+                // Если это последний элемент, ему теоретически не нужен запас под кнопку,
+                // НО только если мы еще не активировали режим forceMenu.
+                const spaceNeeded = isLastElement ? itemFullWidth : (itemFullWidth + menuButtonSpace);
+
+                // Условие скрытия:
+                // 1. Либо уже включен режим принудительного меню (предыдущие не влезли)
+                // 2. Либо текущий элемент не влезает по ширине
+                // 3. Либо это мобилка и мы скрываем все кроме первого
+                if (forceMenu || currentUsedWidth + spaceNeeded > headerWidth || (isMobile && i > 0)) {
+                    
+                    // Включаем флаг: все последующие элементы тоже должны быть скрыты
+                    forceMenu = true;
+
+                    // Скрываем элемент из шапки
+                    el.style.display = 'none';
+                    hiddenCount++;
+
+                    // Добавляем в выпадающее меню
+                    const menuLink = createFilterLink(text, yearVal, true);
+                    menuContent.appendChild(menuLink);
+                } else {
+                    // Показываем элемент в шапке
+                    el.style.display = 'inline-flex';
+                    currentUsedWidth += itemFullWidth;
+                }
+            }
+
+            // Показываем или скрываем саму кнопку гамбургера
+            if (hiddenCount > 0) {
+                menuDropdown.style.display = 'block';
+            } else {
+                menuDropdown.style.display = 'none';
+            }
+        }
+
+        // Debounce для оптимизации resize
+        function debounce(func, timeout = 25) {
+            let timer;
+            return (...args) => {
+                clearTimeout(timer);
+                timer = setTimeout(() => { func.apply(this, args); }, timeout);
+            };
+        }
+
+        const debouncedUpdate = debounce(updateFiltersVisibility);
+        window.addEventListener('resize', debouncedUpdate);
+
+        // Гамбургер-Меню
+        menuButton.onclick = (e) => {
+            e.stopPropagation();
+            menuContent.classList.toggle('show');
+            sortContent.classList.remove('show');
+        };
+
+        // Первичный запуск расчета видимости
+        requestAnimationFrame(() => {
+            updateFiltersVisibility();
+        });
+    }
+        // === Инициализация Сортировки (Адаптивная кнопка) ===
+        function initSortDropdown() {
+            // Показать/скрыть меню сортировки
+            sortButton.onclick = (e) => {
+                e.stopPropagation();
+                sortContent.classList.toggle('show');
+                menuContent.classList.remove('show'); // Закрыть гамбургер-меню
+            };
+
+            // Обработка выбора режима сортировки
+            document.querySelectorAll('.sort-content-item').forEach(item => {
+                item.onclick = (e) => {
+                    e.stopPropagation();
+                    const newSort = item.getAttribute('data-sort');
+                    if (newSort !== currentSort) {
+                        currentSort = newSort;
+                        // *** ИЗМЕНЕНИЕ 5: Использование SORT_STORAGE_KEY ***
+                        localStorage.setItem(SORT_STORAGE_KEY, newSort); 
+                        updateSortButton(newSort);
+                        renderAlbums(); // Перерисовка с новым порядком
+                    }
+                    sortContent.classList.remove('show');
+                };
+            });
+            
+            // updateSortButton(currentSort); // Вызывается после загрузки
+        }
+        
+        // === Инициализация темы ===
+        function initThemeToggle() {
+            const body = document.body;
+            const toggleIcon = themeToggle;
+            
+            const updateIcon = (isDark) => {
+                toggleIcon.textContent = isDark ? 'light_mode' : 'nightlight_round';
+            };
+
+            // Загрузка сохраненной темы
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                body.classList.add('dark-theme');
+                updateIcon(true);
+            } else {
+                body.classList.remove('dark-theme');
+                updateIcon(false);
+            }
+
+            themeToggle.onclick = () => {
+                if (body.classList.contains('dark-theme')) {
+                    body.classList.remove('dark-theme');
+                    updateIcon(false);
+                    localStorage.setItem('theme', 'light');
+                } else {
+                    body.classList.add('dark-theme');
+                    updateIcon(true);
+                    localStorage.setItem('theme', 'dark');
+                }
+            };
+        }
+
+        // === Глобальные обработчики ===
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // *** Загрузка состояния из localStorage до инициализации фильтров ***
+            const savedYear = localStorage.getItem(YEAR_STORAGE_KEY);
+            const savedSort = localStorage.getItem(SORT_STORAGE_KEY);
+            const savedSearchTerm = localStorage.getItem(SEARCH_STORAGE_KEY);
+            
+            // Применение сохраненных значений
+            if (savedYear) {
+                currentYearFilter = savedYear;
+            }
+            if (savedSort) {
+                currentSort = savedSort;
+            }
+            if (savedSearchTerm) {
+                searchInput.value = savedSearchTerm;
+                // Показать кнопку очистки, если есть сохраненный запрос
+                if (savedSearchTerm.length > 0) {
+                    clearButton.style.display = 'block';
+                }
+            }
+            
+            initThemeToggle();
+            // Обновляем кнопку сортировки с учетом загруженного режима
+            updateSortButton(currentSort); 
+            initYearFilters();
+            initSortDropdown();
+
+            // Сворачивание меню при клике в другом месте
+            window.addEventListener('click', () => {
+                menuContent.classList.remove('show');
+                sortContent.classList.remove('show');
+            });
+            menuContent.addEventListener('click', e => e.stopPropagation());
+            sortContent.addEventListener('click', e => e.stopPropagation());
+            
+            // Клик на контейнере поиска фокусирует на поле ввода
+            searchContainer.onclick = (e) => {
+                e.stopPropagation();
+                searchInput.focus();
+            };
+
+            // Обработчик кнопки очистки
+            clearButton.onclick = (e) => {
+                e.stopPropagation();
+                searchInput.value = '';
+                filterAlbums(); 
+                searchInput.focus(); 
+            };
+            
+            // Инициализация при загрузке: Render
+            renderAlbums(currentYearFilter); // Вызываем renderAlbums с загруженным годом и поиском из input
+        });
+
+    </script>
+</body>
+</html>
