@@ -958,6 +958,13 @@ function isRecentlyAdded(addedDateString) {
         const debouncedUpdate = debounce(updateFiltersVisibility);
         window.addEventListener('resize', debouncedUpdate);
 
+window.addEventListener('orientationchange', () => {
+    // Ждем 300мс, пока закончится анимация поворота интерфейса телефона
+    setTimeout(() => {
+        updateFiltersVisibility();
+    }, 300);
+});
+		
         // Гамбургер-Меню
         menuButton.onclick = (e) => {
             e.stopPropagation();
@@ -1089,4 +1096,5 @@ function isRecentlyAdded(addedDateString) {
 </body>
 
 </html>
+
 
