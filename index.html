@@ -439,8 +439,8 @@
     display: flex;           /* Включаем Flexbox */
     align-items: center;     /* Центрируем по вертикали */
     justify-content: center; /* Центрируем по горизонтали */
-   
-/* Остальные стили без изменений */
+    
+    /* Остальные стили без изменений */
     border-radius: 50%;
     cursor: pointer;
     transition: background-color 0.2s;
@@ -665,7 +665,7 @@ function isRecentlyAdded(addedDateString) {
     
     const addedDate = new Date(normalizedDateString);
     const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 30);
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
     
     // Проверяем, что addedDate является валидной датой (не Invalid Date)
     // и что addedDate больше, чем sevenDaysAgo
@@ -878,76 +878,79 @@ function isRecentlyAdded(addedDateString) {
             filtersContainer.appendChild(yearLink);
         });
 
-        // Логика адаптивного скрытия
+// Логика адаптивного скрытия
         function updateFiltersVisibility() {
-            // Очищаем меню перед пересчетом
-            menuContent.innerHTML = '';
-            
-            const isMobile = window.matchMedia('(max-width: 750px)').matches;
-            
-            const headerWidth = filtersContainer.offsetWidth; // Доступная ширина контейнера фильтров
-            let currentUsedWidth = 0;
-            
-            // Ширина одного элемента (56px ширина + 8px margin) = 64px
+            // 1. СБРОС СОСТОЯНИЯ
+            // Сначала СКРЫВАЕМ кнопку меню. Это заставляет контейнер .filters
+            // расшириться на всю доступную ширину. Теперь у нас есть "Эталонная ширина".
+            // Это устраняет разницу между "обновили страницу" и "уменьшили окно".
+            menuDropdown.style.display = 'none';
+
+            // 2. ЗАМЕР
+            // offsetWidth вызывает принудительный пересчет макета (Reflow).
+            // Мы получаем точную ширину, доступную для фильтров, если бы кнопки меню не существовало.
+            const fullAvailableWidth = filtersContainer.offsetWidth;
+
+            // 3. КОНСТАНТЫ
+            // Ширина кнопки года (56px) + отступ (8px) = 64px
             const itemFullWidth = 64; 
-            
-            // Запас места под кнопку меню (гамбургер)
-            const menuButtonSpace = 8;
+            // Ширина кнопки меню (40px) + её отступ (8px) = 48px
+            const menuButtonWidth = 48; 
 
             const allFilterElements = Array.from(filtersContainer.children);
-            let hiddenCount = 0;
+            const totalItems = allFilterElements.length;
             
-            // === ИСПРАВЛЕНИЕ ===
-            // Флаг: если true, значит место закончилось и все остальные элементы 
-            // принудительно отправляем в меню, не проверяя ширину.
-            let forceMenu = false; 
+            // Очищаем меню перед распределением
+            menuContent.innerHTML = ''; 
 
-            // Перебираем ВСЕ элементы
-            for (let i = 0; i < allFilterElements.length; i++) {
-                const el = allFilterElements[i];
-                const text = el.textContent;
-                const yearVal = el.getAttribute('data-year');
-                
-                // Если это последний элемент в списке
-                const isLastElement = (i === allFilterElements.length - 1);
-                
-                // Если это последний элемент, ему теоретически не нужен запас под кнопку,
-                // НО только если мы еще не активировали режим forceMenu.
-                const spaceNeeded = isLastElement ? itemFullWidth : (itemFullWidth + menuButtonSpace);
+            // 4. ПРОВЕРКА: Влезают ли ВСЕ годы в "Эталонную ширину" БЕЗ кнопки меню?
+            const totalWidthNeeded = totalItems * itemFullWidth;
 
-                // Условие скрытия:
-                // 1. Либо уже включен режим принудительного меню (предыдущие не влезли)
-                // 2. Либо текущий элемент не влезает по ширине
-                // 3. Либо это мобилка и мы скрываем все кроме первого
-                if (forceMenu || currentUsedWidth + spaceNeeded > headerWidth || (isMobile && i > 0)) {
-                    
-                    // Включаем флаг: все последующие элементы тоже должны быть скрыты
-                    forceMenu = true;
-
-                    // Скрываем элемент из шапки
-                    el.style.display = 'none';
-                    hiddenCount++;
-
-                    // Добавляем в выпадающее меню
-                    const menuLink = createFilterLink(text, yearVal, true);
-                    menuContent.appendChild(menuLink);
-                } else {
-                    // Показываем элемент в шапке
-                    el.style.display = 'inline-flex';
-                    currentUsedWidth += itemFullWidth;
-                }
+            if (totalWidthNeeded <= fullAvailableWidth) {
+                // Сценарий А: Всё помещается. 
+                // Кнопку меню мы уже скрыли в шаге 1, просто показываем все годы.
+                allFilterElements.forEach(el => el.style.display = 'inline-flex');
+                return; // Выходим, всё готово.
             }
 
-            // Показываем или скрываем саму кнопку гамбургера
-            if (hiddenCount > 0) {
+            // 5. РАСЧЕТ С УЧЕТОМ МЕНЮ
+            // Если мы здесь, значит всё не влезло. Нам ОБЯЗАТЕЛЬНО нужна кнопка меню.
+            // Вычисляем "Рабочую зону": Эталонная ширина минус место под кнопку меню.
+            const usableWidth = fullAvailableWidth - menuButtonWidth;
+
+            let currentUsedWidth = 0;
+            let hasHiddenItems = false;
+
+            allFilterElements.forEach(el => {
+                const text = el.textContent;
+                const yearVal = el.getAttribute('data-year');
+
+                // Строгая проверка: влезает ли текущий элемент в Рабочую зону?
+                // Убраны все лишние "запасы", используется чистая математика.
+                if (currentUsedWidth + itemFullWidth <= usableWidth) {
+                    // Влезает -> Оставляем в шапке
+                    el.style.display = 'inline-flex';
+                    currentUsedWidth += itemFullWidth;
+                } else {
+                    // Не влезает -> В меню
+                    el.style.display = 'none';
+                    hasHiddenItems = true;
+
+                    // Создаем пункт меню
+                    const menuLink = createFilterLink(text, yearVal, true);
+                    menuContent.appendChild(menuLink);
+                }
+            });
+
+            // 6. ФИНАЛ
+            // Раз есть скрытые элементы, включаем кнопку меню
+            if (hasHiddenItems) {
                 menuDropdown.style.display = 'block';
-            } else {
-                menuDropdown.style.display = 'none';
             }
         }
 
         // Debounce для оптимизации resize
-        function debounce(func, timeout = 250) {
+        function debounce(func, timeout = 25) {
             let timer;
             return (...args) => {
                 clearTimeout(timer);
@@ -958,13 +961,14 @@ function isRecentlyAdded(addedDateString) {
         const debouncedUpdate = debounce(updateFiltersVisibility);
         window.addEventListener('resize', debouncedUpdate);
 
-window.addEventListener('orientationchange', () => {
-    // Ждем 300мс, пока закончится анимация поворота интерфейса телефона
-    setTimeout(() => {
-        updateFiltersVisibility();
-    }, 300);
-});
-		
+	// === ИСПРАВЛЕНИЕ: Принудительный пересчет после поворота экрана ===
+	window.addEventListener('orientationchange', () => {
+	    // Ждем 300мс, пока закончится анимация поворота интерфейса телефона
+	    setTimeout(() => {
+	        updateFiltersVisibility();
+	    }, 300);
+	});
+
         // Гамбургер-Меню
         menuButton.onclick = (e) => {
             e.stopPropagation();
@@ -1094,7 +1098,4 @@ window.addEventListener('orientationchange', () => {
 
     </script>
 </body>
-
 </html>
-
-
