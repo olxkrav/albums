@@ -29,6 +29,13 @@
             --color-badge-dark: #C2E7FF;
             --color-shadow-light: rgba(60, 64, 67, 0.15);
             --color-shadow-dark: rgba(0, 0, 0, 0.5);
+            
+            /* Цвета скроллбара */
+            --color-scrollbar-thumb-light: rgba(60, 64, 67, 0.4);
+            --color-scrollbar-thumb-dark: rgba(196, 199, 197, 0.4);
+            --color-scrollbar-thumb-hover-light: rgba(60, 64, 67, 0.6);
+            --color-scrollbar-thumb-hover-dark: rgba(196, 199, 197, 0.6);
+
             --font-size-small: 14px;
             --header-item-spacing: 8px;
             --header-element-height: 36px;
@@ -48,6 +55,8 @@
             --color-link-active: var(--color-link-active-dark);
             --color-link-active-highlight: var(--color-link-active-highlight-dark);
             --color-badge: var(--color-badge-dark);
+            --color-scrollbar: var(--color-scrollbar-thumb-dark);
+            --color-scrollbar-hover: var(--color-scrollbar-thumb-hover-dark);
         }
 
         body { /* Light Theme Defaults */
@@ -61,16 +70,20 @@
             --color-link-active: var(--color-link-active-light);
             --color-link-active-highlight: var(--color-link-active-highlight-light);
             --color-badge: var(--color-badge-light);
+            --color-scrollbar: var(--color-scrollbar-thumb-light);
+            --color-scrollbar-hover: var(--color-scrollbar-thumb-hover-light);
         }
 
         /* === Общие Стили === */
-        * { box-sizing: border-box; scrollbar-width: none; }
-        *::-webkit-scrollbar { display: none; width: 0; height: 0; }
-
-        body {
-            font-family: 'Roboto', Arial, sans-serif;
+        * { box-sizing: border-box; }
+        
+        /* Убираем скролл на body, чтобы скроллился только main */
+        html, body {
+            height: 100%;
             margin: 0;
-            padding-top: 64px; 
+            padding: 0;
+            overflow: hidden; /* Важно: отключаем прокрутку страницы целиком */
+            font-family: 'Roboto', Arial, sans-serif;
             background-color: var(--color-background);
             color: var(--color-text-on-surface);
             transition: background-color 0.3s, color 0.3s;
@@ -94,8 +107,7 @@
         .logo-text {
             font-size: 20px; font-weight: 500; color: var(--color-text);
             transform: translateY(-2px); white-space: nowrap; overflow: hidden;
-            text-overflow: ellipsis; display: block; width: 118px;
-            /* Изменение: Центрирование текста внутри блока */
+            text-overflow: ellipsis; display: block; width: 120px;
             text-align: center;
         }
 
@@ -106,7 +118,6 @@
             margin-right: 0; 
             overflow: hidden; 
             flex-shrink: 1; 
-            /* НОВОЕ СВОЙСТВО: центрирование содержимого */
             justify-content: center;
         }
         
@@ -177,7 +188,6 @@
         
         .sort-content-item { display: flex; align-items: center; }
         .sort-content-item .material-icons { margin-right: 12px; font-size: 20px; color: var(--color-text); }
-        /* Добавил отступ к тексту сортировки, чтобы он не сливался с иконкой */
         .sort-content-item span[data-sort-label] { margin-right: 8px; }
 
         /* --- Поиск --- */
@@ -216,15 +226,72 @@
             cursor: pointer; border: 2px solid var(--color-surface); flex-shrink: 0;
         }
 
-        /* --- Карточки --- */
+        /* === Карточки и Сетка (Главный контейнер) === */
         .album-grid {
-            padding: 24px; display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 24px;
+            position: absolute;
+            top: 64px; /* Высота шапки */
+            bottom: 0; /* До самого низа */
+            left: 0;
+            right: 0;
+            overflow-y: auto; /* Включаем скролл только внутри этого блока */
+            
+            /* ИСПРАВЛЕНО: Правый padding уменьшен на ширину скроллбара (12px), 
+               чтобы визуально отступы слева (24px) и справа (12px + 12px скролл) были равны */
+            padding: 24px 12px 24px 24px; 
+            
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); 
+            gap: 24px;
+            
+            align-content: flex-start; 
+            grid-auto-rows: max-content; 
+            
+            scroll-behavior: smooth;
+            
+            /* Настройки скроллбара для Firefox */
+            scrollbar-width: thin;
+            scrollbar-color: transparent transparent; /* Скрыт по умолчанию */
+            transition: scrollbar-color 0.3s;
         }
+
+        /* Класс для отображения скроллбара (добавляется JS) */
+        .album-grid.is-scrolling {
+            scrollbar-color: var(--color-scrollbar) transparent;
+        }
+
+        /* Настройки скроллбара для Webkit (Chrome, Edge, Safari) */
+        .album-grid::-webkit-scrollbar {
+            width: 12px;
+            background-color: transparent;
+        }
+
+        .album-grid::-webkit-scrollbar-track {
+            background-color: transparent;
+        }
+
+        .album-grid::-webkit-scrollbar-thumb {
+            background-color: transparent; /* Скрыт по умолчанию */
+            border-radius: 6px;
+            border: 3px solid transparent;
+            background-clip: content-box;
+            transition: background-color 0.3s;
+        }
+        
+        /* Когда класс активен или мышь прямо над скроллбаром */
+        .album-grid.is-scrolling::-webkit-scrollbar-thumb,
+        .album-grid::-webkit-scrollbar-thumb:hover {
+            background-color: var(--color-scrollbar);
+        }
+        
+        .album-grid::-webkit-scrollbar-thumb:hover {
+            background-color: var(--color-scrollbar-hover);
+        }
+
         .album-card {
             background-color: var(--color-card-background); border-radius: 8px;
             overflow: hidden; box-shadow: 0 1px 3px var(--color-shadow);
             transition: box-shadow 0.3s, transform 0.3s;
+            height: fit-content; 
         }
         .album-card:hover {
             box-shadow: 0 4px 8px var(--color-shadow); transform: translateY(-2px);
@@ -324,7 +391,7 @@
 
         function getLocaleStrings() {
             const userLang = (navigator.language || navigator.userLanguage).toLowerCase();
-            let lang = 'en'; // По умолчанию - английский
+            let lang = 'en'; 
 
             if (userLang.startsWith('ru')) {
                 lang = 'ru';
@@ -332,15 +399,12 @@
                 lang = 'uk';
             }
 
-            const strings = { lang: lang }; // Добавляем определенный язык в объект
+            const strings = { lang: lang }; 
             for (const key in TRANSLATIONS) {
-                // Используем строку для выбранного языка, с резервом на английский
                 strings[key] = TRANSLATIONS[key][lang] || TRANSLATIONS[key]['en'];
             }
             
-            // Устанавливаем атрибут lang на HTML-теге
             document.documentElement.lang = lang;
-            
             return strings;
         }
 
@@ -442,6 +506,7 @@
             searchInput: document.getElementById('search-input'),
             clearButton: document.getElementById('clear-search-button'),
             themeToggle: document.getElementById('theme-toggle'),
+            header: document.getElementById('main-header'),
         };
 
         const state = {
@@ -452,7 +517,6 @@
 
         // --- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ---
         function isRecentlyAdded(addedDateStr) {
-            // Считаем "недавно добавленными" альбомы, добавленные в последние 7 дней
             const oneWeekAgo = new Date();
             oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
             const addedDate = new Date(addedDateStr);
@@ -464,7 +528,6 @@
             card.className = 'album-card';
             const badgeHTML = isRecentlyAdded(album.addedDate) ? '<div class="new-badge"><span class="material-icons">notifications</span></div>' : '';
             
-            // Определяем заголовок на основе текущего языка, с резервом на русский
             const currentLang = STRINGS.lang;
             const descriptiveTitle = album.title[currentLang] || album.title['ru'];
             const fullTitle = album.prefix + descriptiveTitle;
@@ -479,7 +542,6 @@
                     </div>
                 </a>
             `;
-            // Безопасная вставка текста
             card.querySelector('.album-title').textContent = fullTitle;
             return card;
         }
@@ -490,15 +552,12 @@
             
             switch (state.sort) {
                 case 'newest':
-                    // Сортировка от новых альбомов к старым (по дате альбома, убывание)
                     sorted.sort((a, b) => b.date.localeCompare(a.date));
                     break;
                 case 'oldest':
-                    // Сортировка от старых альбомов к новым (по дате альбома, возрастание)
                     sorted.sort((a, b) => a.date.localeCompare(b.date));
                     break;
                 case 'added':
-                    // Сортировка по дате добавления (убывание)
                     sorted.sort((a, b) => b.addedDate.localeCompare(a.addedDate));
                     break;
             }
@@ -509,15 +568,13 @@
             UI.grid.innerHTML = '';
             let result = getSortedAlbums();
 
-            // Фильтр по году
             if (state.year !== 'all') {
                 result = result.filter(a => a.year === state.year);
             }
 
-            // Фильтр по поиску (используем локализованное название)
             if (state.search) {
                 const query = state.search.toLowerCase();
-                const currentLang = STRINGS.lang; // Используем текущий язык
+                const currentLang = STRINGS.lang;
 
                 result = result.filter(a => {
                     const descriptiveTitle = a.title[currentLang] || a.title['ru'];
@@ -529,7 +586,6 @@
             if (result.length > 0) {
                 result.forEach(album => UI.grid.appendChild(createAlbumCard(album)));
             } else {
-                // Используем локализованную строку "Не найдено..."
                 UI.grid.innerHTML = `<p style="text-align: center; width: 100%; color: var(--color-text); padding: 20px;">${STRINGS.not_found}</p>`;
             }
 
@@ -537,12 +593,9 @@
         }
 
         function updateActiveClasses() {
-            // Фильтры
             document.querySelectorAll('.filter-link, .menu-content-item').forEach(el => {
                 el.classList.toggle('active', el.getAttribute('data-year') === state.year);
             });
-
-            // Сортировка
             document.querySelectorAll('.sort-content-item').forEach(el => {
                 el.classList.toggle('active', el.getAttribute('data-sort') === state.sort);
             });
@@ -550,7 +603,6 @@
 
         function updateSortButtonUI() {
             const map = {
-                // Используем локализованные строки
                 newest: { icon: 'arrow_downward', label: STRINGS.newest_sort },
                 oldest: { icon: 'arrow_upward', label: STRINGS.oldest_sort },
                 added: { icon: 'notifications', label: STRINGS.added_sort }
@@ -560,7 +612,6 @@
             UI.sortLabel.textContent = current.label;
         }
 
-        // --- Debounce для поиска ---
         function debounce(func, wait) {
             let timeout;
             return function(...args) {
@@ -580,7 +631,6 @@
         function initYearFilters() {
             const years = [...new Set(albums.map(a => a.year))].sort((a, b) => b - a);
 
-            // Вспомогательная функция для создания ссылок фильтра
             const createLink = (text, year, isMenuItem) => {
                 const el = document.createElement(isMenuItem ? 'div' : 'a');
                 el.className = isMenuItem ? 'menu-content-item' : 'filter-link';
@@ -595,33 +645,25 @@
                 return el;
             };
 
-            // создаем ссылку "Все" и добавляем ее в шапку
-            UI.filtersContainer.appendChild(createLink(STRINGS.all_filter, 'all', false)); // Используем локализованную строку
+            UI.filtersContainer.appendChild(createLink(STRINGS.all_filter, 'all', false));
             years.forEach(y => UI.filtersContainer.appendChild(createLink(y, y, false)));
 
-            // Функция пересчета видимости (Reset -> Measure -> Distribute)
             function updateFiltersVisibility() {
-                // 1. Сброс: Скрываем меню, чтобы узнать реальную полную ширину
                 UI.menuDropdown.style.display = 'none';
                 const allElements = Array.from(UI.filtersContainer.children);
-                // Показываем все элементы временно, чтобы offsetWidth был корректен
                 allElements.forEach(el => el.style.display = 'inline-flex');
 
-                // 2. Замер доступного места
                 const containerWidth = UI.filtersContainer.offsetWidth;
-                const itemWidth = 64; // 56px + 8px margin
-                const menuBtnWidth = 48; // 40px + 8px margin
+                const itemWidth = 64; 
+                const menuBtnWidth = 48; 
                 const totalNeeded = allElements.length * itemWidth;
 
-                // 3. Распределение
                 UI.menuContent.innerHTML = '';
 
-                // Если всё влезает без меню
                 if (totalNeeded <= containerWidth) {
                     return;
                 }
 
-                // Если не влезает, вычитаем место под кнопку
                 const usableWidth = containerWidth - menuBtnWidth;
                 let usedWidth = 0;
                 let hasHidden = false;
@@ -633,7 +675,6 @@
                     } else {
                         el.style.display = 'none';
                         hasHidden = true;
-                        // Клонируем логику в меню
                         UI.menuContent.appendChild(createLink(el.textContent, el.getAttribute('data-year'), true));
                     }
                 });
@@ -643,39 +684,115 @@
                 }
             }
 
-            // Слушатели resize
             const debouncedResize = debounce(updateFiltersVisibility, 50);
             window.addEventListener('resize', debouncedResize);
             window.addEventListener('orientationchange', () => setTimeout(updateFiltersVisibility, 300));
 
-            // Первый запуск
             requestAnimationFrame(updateFiltersVisibility);
+        }
+
+        // --- SCROLLBAR LOGIC (ПОЛНОСТЬЮ ПЕРЕПИСАНО) ---
+        function initScrollLogic() {
+            let scrollTimeout;
+            const scrollContainer = UI.grid;
+
+            // Функция показа скроллбара
+            const showScroll = () => {
+                scrollContainer.classList.add('is-scrolling');
+                clearTimeout(scrollTimeout);
+                scrollTimeout = setTimeout(() => {
+                    scrollContainer.classList.remove('is-scrolling');
+                }, 1500);
+            };
+
+            // 1. Наведение на правый край
+            document.addEventListener('mousemove', (e) => {
+                if (window.innerWidth - e.clientX < 20) {
+                    showScroll();
+                }
+            });
+
+            // 2. Прокрутка колесиком ВНУТРИ контейнера
+            scrollContainer.addEventListener('scroll', () => {
+                showScroll();
+            });
+            
+            // 3. Прокрутка колесиком НАД ШАПКОЙ
+            UI.header.addEventListener('wheel', (e) => {
+                scrollContainer.scrollTop += e.deltaY;
+                showScroll();
+            }, { passive: true });
+
+            // 4. ГЛОБАЛЬНЫЙ ПЕРЕХВАТ КЛАВИШ (Исправлено)
+            // Мы слушаем window и вручную крутим контейнер, если фокус не в поиске
+            window.addEventListener('keydown', (e) => {
+                // Если фокус сейчас в поле поиска - ничего не трогаем, пусть печатает
+                if (document.activeElement === UI.searchInput) return;
+
+                const scrollAmount = 50; // Шаг прокрутки стрелками
+                const pageAmount = scrollContainer.clientHeight * 0.9; // Шаг PageUp/Down
+                let handled = false;
+
+                switch (e.key) {
+                    case 'ArrowDown':
+                        scrollContainer.scrollTop += scrollAmount;
+                        handled = true;
+                        break;
+                    case 'ArrowUp':
+                        scrollContainer.scrollTop -= scrollAmount;
+                        handled = true;
+                        break;
+                    case 'PageDown':
+                        scrollContainer.scrollTop += pageAmount;
+                        handled = true;
+                        break;
+                    case 'PageUp':
+                        scrollContainer.scrollTop -= pageAmount;
+                        handled = true;
+                        break;
+                    case 'Home':
+                        scrollContainer.scrollTop = 0;
+                        handled = true;
+                        break;
+                    case 'End':
+                        scrollContainer.scrollTop = scrollContainer.scrollHeight;
+                        handled = true;
+                        break;
+                    case ' ': // Пробел (тоже крутит страницу)
+                        if (e.shiftKey) {
+                            scrollContainer.scrollTop -= pageAmount;
+                        } else {
+                            scrollContainer.scrollTop += pageAmount;
+                        }
+                        handled = true;
+                        break;
+                }
+
+                if (handled) {
+                    e.preventDefault(); // Запрещаем браузеру пытаться скроллить body (который и так hidden)
+                    showScroll(); // Показываем скроллбар
+                }
+            });
         }
 
         // --- Инициализация ---
         document.addEventListener('DOMContentLoaded', () => {
-            // --- Локализация статических элементов ---
             document.title = STRINGS.title;
             UI.logoText.textContent = STRINGS.logo_text;
             UI.searchInput.placeholder = STRINGS.search_placeholder;
             
-            // Заполняем элементы выпадающего списка сортировки
             document.querySelector('.sort-content-item[data-sort="newest"]').querySelector('span[data-sort-label]').textContent = STRINGS.newest_sort;
             document.querySelector('.sort-content-item[data-sort="oldest"]').querySelector('span[data-sort-label]').textContent = STRINGS.oldest_sort;
             document.querySelector('.sort-content-item[data-sort="added"]').querySelector('span[data-sort-label]').textContent = STRINGS.added_sort;
 
-
-            // Загрузка из Storage
             state.year = localStorage.getItem(STORAGE_KEYS.YEAR) || 'all';
             state.sort = localStorage.getItem(STORAGE_KEYS.SORT) || 'newest';
             state.search = localStorage.getItem(STORAGE_KEYS.SEARCH) || '';
 
-            // UI Setup
             UI.searchInput.value = state.search;
             if(state.search) UI.clearButton.style.display = 'block';
             updateSortButtonUI();
             
-            // Event Listeners
             UI.searchInput.addEventListener('input', handleSearchInput);
             UI.clearButton.addEventListener('click', () => {
                 UI.searchInput.value = '';
@@ -706,13 +823,11 @@
                 UI.sortContent.classList.remove('show');
             };
 
-
             initYearFilters();
             renderAlbums();
+            initScrollLogic();
 
             // --- ТЕМНАЯ / СВЕТЛАЯ ТЕМА ---
-
-            // 1. ПРОВЕРКА НАЧАЛЬНОГО СОСТОЯНИЯ
             const applyTheme = (isDark) => {
                 document.body.classList.toggle('dark-theme', isDark);
                 UI.themeToggle.textContent = isDark ? 'light_mode' : 'nightlight_round';
@@ -722,36 +837,24 @@
             const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
             if (savedTheme) {
-                // Если есть ручной выбор - используем его
                 applyTheme(savedTheme === 'dark');
             } else {
-                // Если нет — ставим как в системе сейчас
                 applyTheme(mediaQuery.matches);
             }
 
-            // 2. СЛУШАТЕЛЬ СИСТЕМНЫХ ИЗМЕНЕНИЙ (Самое важное для вас)
-            // Сработает, если вы поменяете тему в настройках телефона, не перезагружая страницу
             mediaQuery.addEventListener('change', (e) => {
-                // Меняем тему автоматически, ТОЛЬКО если пользователь НЕ переопределил её вручную
                 if (!localStorage.getItem(STORAGE_KEYS.THEME)) {
                     applyTheme(e.matches);
                 }
             });
 
-            // 3. Ручное переключение по кнопке
             UI.themeToggle.onclick = () => {
-                // Смотрим, какая тема сейчас, и меняем на противоположную
                 const isCurrentDark = document.body.classList.contains('dark-theme');
                 const newThemeIsDark = !isCurrentDark;
-                
                 applyTheme(newThemeIsDark);
-                
-                // ЗАПОМИНАЕМ выбор. С этого момента автоматика (пункт 2) перестанет работать,
-                // пока пользователь не очистит кэш. Это стандартное поведение.
                 localStorage.setItem(STORAGE_KEYS.THEME, newThemeIsDark ? 'dark' : 'light');
             };
 
-            // Close menus on outside click
             window.addEventListener('click', () => {
                 UI.menuContent.classList.remove('show');
                 UI.sortContent.classList.remove('show');
