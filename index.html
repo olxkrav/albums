@@ -133,7 +133,7 @@
         .filter-link:hover { background-color: var(--color-surface); }
         .filter-link.active { color: var(--color-link-active); background-color: var(--color-link-active-highlight); }
         
-        /* === NEW: Стиль для фокуса клавиатуры (мимикрирует :hover) === */
+        /* === Стиль для фокуса клавиатуры (мимикрирует :hover) === */
         .filter-link.keyboard-focus { background-color: var(--color-surface); }
         /* При этом active link сохраняет свой цвет */
         .filter-link.active.keyboard-focus { background-color: var(--color-link-active-highlight); } 
@@ -208,7 +208,7 @@
             background-color: var(--color-link-active-highlight);
         }
         
-        /* === NEW: Стиль для фокуса клавиатуры в меню === */
+        /* === Стиль для фокуса клавиатуры в меню === */
         .menu-content-item.keyboard-focus { background-color: var(--color-surface); }
         /* Fix: active item with keyboard focus should keep its active color */
         .menu-content-item.active.keyboard-focus { background-color: var(--color-link-active-highlight); } 
@@ -222,7 +222,7 @@
         }
         .menu-button:hover { background-color: var(--color-surface); }
         
-        /* === NEW: Стиль для фокуса клавиатуры на кнопке меню === */
+        /* === Стиль для фокуса клавиатуры на кнопке меню === */
         .menu-button.keyboard-focus { background-color: var(--color-surface); }
         /* ======================================================= */
 
@@ -576,7 +576,7 @@
             search: ''
         };
 
-        // --- NEW: СОСТОЯНИЕ И ЛОГИКА НАВИГАЦИИ ПО ФИЛЬТРАМ ГОДОВ ---
+        // --- СОСТОЯНИЕ И ЛОГИКА НАВИГАЦИИ ПО ФИЛЬТРАМ ГОДОВ ---
         const KEY_DELAY = 300; // Начальная задержка перед повтором (мс)
         const KEY_INTERVAL = 100; // Интервал непрерывного повтора (мс)
         
@@ -586,7 +586,7 @@
             isNavigating: false,
             focusedElement: null,
             keyRepeatTimeout: null,
-            keyRepeatInterval: null, // NEW: для управления повторами клавиш
+            keyRepeatInterval: null, 
         };
 
         function clearFocus() {
@@ -623,7 +623,6 @@
             }
         }
         
-        // NEW: Helper function to clear key repeat state
         function clearKeyRepeat() {
             clearTimeout(navigation.keyRepeatTimeout);
             clearInterval(navigation.keyRepeatInterval);
@@ -631,7 +630,6 @@
             navigation.keyRepeatInterval = null;
         }
 
-        // NEW: Helper function to move focus
         function moveFocus(direction) {
             const len = navigation.navigableFilters.length;
             let newIndex = navigation.focusedIndex;
@@ -650,7 +648,54 @@
                 focusElement(newIndex);
             }
         }
-        // --- END NEW: NAVIGATION LOGIC ---
+        // --- END NAVIGATION LOGIC ---
+
+        // --- NEW: ФУНКЦИИ ОБРАБОТКИ СОБЫТИЙ ДЛЯ ФИЛЬТРОВ И МЕНЮ ---
+        // Общая логика активации фильтра (для click и touchstart)
+        function handleFilterTap(el, year, e) {
+            e.stopPropagation();
+            
+            // Core Logic
+            state.year = year;
+            localStorage.setItem(STORAGE_KEYS.YEAR, year);
+            renderAlbums();
+
+            // Navigation/Focus Logic
+            const clickedIndex = navigation.navigableFilters.findIndex(item => item === el);
+            if (clickedIndex !== -1) {
+                navigation.isNavigating = true;
+                focusElement(clickedIndex);
+                if (el.classList.contains('menu-content-item')) {
+                    // Закрываем меню после выбора в нем
+                    UI.menuContent.classList.remove('show');
+                }
+            } else {
+                 clearFocus();
+                 navigation.isNavigating = false;
+            }
+        }
+
+        // Логика переключения меню годов (для click и touchstart)
+        function handleMenuToggle(e) {
+            e.stopPropagation();
+            UI.sortContent.classList.remove('show');
+
+            // --- Синхронизация фокуса при открытии/закрытии меню ---
+            UI.menuContent.classList.toggle('show');
+
+            const menuButtonIndex = navigation.navigableFilters.findIndex(item => item === UI.menuButton);
+            if (menuButtonIndex !== -1) {
+                if (UI.menuContent.classList.contains('show')) {
+                    navigation.isNavigating = true;
+                    focusElement(menuButtonIndex);
+                } else {
+                    // Если меню закрывается, очищаем фокус, но не выходим из режима навигации
+                    clearFocus(); 
+                }
+            }
+        }
+        // --- END NEW: ФУНКЦИИ ОБРАБОТКИ СОБЫТИЙ ДЛЯ ФИЛЬТРОВ И МЕНЮ ---
+
 
         // --- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ---
         function isRecentlyAdded(addedDateStr) {
@@ -771,29 +816,17 @@
                 el.setAttribute('data-year', year);
                 el.textContent = text;
                 
-                el.onclick = (e) => {
-                    e.stopPropagation();
-                    
-                    // --- NEW: Start navigation on click and set focus ---
-                    const clickedIndex = navigation.navigableFilters.findIndex(item => item === el);
-                    if (clickedIndex !== -1) {
-                        navigation.isNavigating = true;
-                        focusElement(clickedIndex);
-                        // Если кликнули в меню, то оно закрывается, но фокус остается
-                        if (el.classList.contains('menu-content-item')) {
-                            UI.menuContent.classList.remove('show');
-                        }
-                    } else {
-                         // Fallback for logic where element is not yet in array (e.g. resize race condition)
-                         clearFocus();
-                         navigation.isNavigating = false;
-                    }
-                    // --- END NEW ---
-
-                    state.year = year;
-                    localStorage.setItem(STORAGE_KEYS.YEAR, year);
-                    renderAlbums();
-                };
+                // NEW: Обработчики для сенсорного и десктопного ввода
+                el.addEventListener('click', (e) => {
+                    handleFilterTap(el, year, e);
+                });
+                
+                el.addEventListener('touchstart', (e) => {
+                    // Используем preventDefault, чтобы предотвратить задержку 300мс и двойной вызов click
+                    e.preventDefault(); 
+                    handleFilterTap(el, year, e);
+                }, { passive: false }); // passive: false, чтобы allow preventDefault
+                
                 return el;
             };
 
@@ -835,6 +868,7 @@
                         } else {
                             el.style.display = 'none';
                             hasHidden = true;
+                            // NEW: При создании элементов меню используется функция createLink с исправленными обработчиками touch
                             UI.menuContent.appendChild(createLink(el.textContent, el.getAttribute('data-year'), true));
                         }
                     });
@@ -944,7 +978,10 @@
                     if (e.key === 'Enter' || e.key === ' ') { 
                         clearKeyRepeat();
                         if (navigation.focusedIndex !== -1) {
-                            navigation.navigableFilters[navigation.focusedIndex].click(); 
+                            // Запускаем обработчик нажатия, чтобы выполнить логику активации
+                            const focusedElement = navigation.navigableFilters[navigation.focusedIndex];
+                            // Используем click() для вызова установленного обработчика
+                            focusedElement.click(); 
                             e.preventDefault();
                             actionHandled = true;
                         }
@@ -1071,25 +1108,31 @@
                 handleSearchInput({ target: UI.searchInput });
             });
             
-            // --- NEW: Останавливаем навигацию по фокусу на поиске ---
+            // --- Останавливаем навигацию по фокусу на поиске ---
             UI.searchInput.addEventListener('focus', () => {
                 navigation.isNavigating = false;
                 clearFocus();
-                clearKeyRepeat(); // Дополнительная очистка
+                clearKeyRepeat();
             });
-            // --- END NEW ---
-
+            
             UI.sortButton.addEventListener('click', (e) => {
                 e.stopPropagation();
                 UI.sortContent.classList.toggle('show');
                 UI.menuContent.classList.remove('show');
                 
-                // --- NEW: Выход из режима навигации при открытии меню сортировки ---
+                // --- Выход из режима навигации при открытии меню сортировки ---
                 navigation.isNavigating = false;
                 clearFocus();
-                clearKeyRepeat(); // Дополнительная очистка
-                // --- END NEW ---
+                clearKeyRepeat();
             });
+            // NEW: Добавляем touchstart для кнопки сортировки
+            UI.sortButton.addEventListener('touchstart', (e) => {
+                e.preventDefault(); // Предотвращаем задержку
+                // Вызываем логику клика
+                UI.sortButton.click(); 
+                e.stopPropagation();
+            }, { passive: false });
+
 
             document.querySelectorAll('.sort-content-item').forEach(item => {
                 item.onclick = (e) => {
@@ -1101,28 +1144,22 @@
                     renderAlbums();
                     UI.sortContent.classList.remove('show');
                 };
+                // NEW: Добавляем touchstart для элементов сортировки
+                item.addEventListener('touchstart', (e) => {
+                    e.preventDefault(); // Предотвращаем задержку
+                    // Вызываем логику клика
+                    item.click(); 
+                    e.stopPropagation();
+                }, { passive: false });
             });
 
-            UI.menuButton.onclick = (e) => {
-                e.stopPropagation();
-                UI.sortContent.classList.remove('show');
-
-                // --- NEW: Синхронизация фокуса при открытии/закрытии меню ---
-                UI.menuContent.classList.toggle('show');
-
-                const menuButtonIndex = navigation.navigableFilters.findIndex(item => item === UI.menuButton);
-                if (menuButtonIndex !== -1) {
-                    if (UI.menuContent.classList.contains('show')) {
-                        navigation.isNavigating = true;
-                        focusElement(menuButtonIndex);
-                    } else {
-                        // Если меню закрывается, очищаем фокус, но не выходим из режима навигации
-                        clearFocus(); 
-                    }
-                }
-                // --- END NEW ---
-            };
-
+            // NEW: Прикрепляем обработчики click и touchstart к кнопке меню, используя handleMenuToggle
+            UI.menuButton.addEventListener('click', handleMenuToggle);
+            UI.menuButton.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                handleMenuToggle(e);
+            }, { passive: false });
+            
             initYearFilters();
             renderAlbums();
             initScrollLogic();
@@ -1159,7 +1196,7 @@
                 // Close menus on outside click
                 UI.sortContent.classList.remove('show');
                 
-                // --- NEW: Выход из режима навигации по клику вне фильтров ---
+                // --- Выход из режима навигации по клику вне фильтров ---
                 let isFilterClick = UI.filtersContainer.contains(e.target) || 
                                     UI.menuDropdown.contains(e.target);
                 
@@ -1173,6 +1210,26 @@
                 }
                 // --- END NEW ---
             });
+            
+            // NEW: Добавляем обработчик touchstart для глобального закрытия меню
+            // Это обеспечит закрытие меню при тапе вне него без задержки
+            window.addEventListener('touchstart', (e) => {
+                // Игнорируем touchstart на элементах, которые обрабатывают его сами (у них e.stopPropagation() или e.preventDefault() предотвратит это)
+                if (UI.filtersContainer.contains(e.target) || UI.menuDropdown.contains(e.target) || UI.sortDropdown.contains(e.target)) {
+                    return; 
+                }
+
+                // Закрываем меню сортировки и годов при тапе вне их
+                UI.sortContent.classList.remove('show');
+                UI.menuContent.classList.remove('show');
+
+                // Если были в режиме навигации, сбрасываем его
+                if (navigation.isNavigating) {
+                    navigation.isNavigating = false;
+                    clearFocus();
+                    clearKeyRepeat();
+                }
+            }, { passive: true });
         });
     </script>
 </body>
