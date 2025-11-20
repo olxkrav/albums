@@ -764,6 +764,13 @@
             
             // 3. Прокрутка колесиком НАД ШАПКОЙ
             UI.header.addEventListener('wheel', (e) => {
+                // Если открыто меню годов или сортировки, блокируем прокрутку основного контейнера.
+                if (UI.menuContent.classList.contains('show') || UI.sortContent.classList.contains('show')) {
+                    // Прокрутка самого меню (menu-content/sort-content) будет обрабатываться браузером,
+                    // так как слушатель является "passive". Мы просто не прокручиваем альбомный грид.
+                    return; 
+                }
+
                 scrollContainer.scrollTop += e.deltaY;
                 showScroll();
             }, { passive: true });
