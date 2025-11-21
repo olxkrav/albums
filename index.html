@@ -729,7 +729,7 @@
                 }
             }
 
-            const debouncedResize = debounce(updateFiltersVisibility, 50);
+            const debouncedResize = debounce(updateFiltersVisibility, 25);
             window.addEventListener('resize', debouncedResize);
             window.addEventListener('orientationchange', () => setTimeout(updateFiltersVisibility, 300));
 
