@@ -248,13 +248,13 @@
         }
         .clear-button:hover { background-color: var(--color-background); }
 
-        /* --- Меню предложений поиска (НОВОЕ) --- */
+        /* --- Меню предложений поиска --- */
         .search-suggestions {
             display: none;
             position: absolute;
-            top: 48px; /* Как у menu-content */
+            top: 48px; 
             left: 0;
-            width: 100%; /* Ширина как у поля поиска */
+            width: 100%; 
             background-color: var(--color-card-background);
             box-shadow: 0 4px 8px var(--color-shadow);
             border-radius: 8px;
@@ -262,7 +262,6 @@
             padding: 0;
             max-height: 200px;
             overflow-y: auto;
-            /* Стили скролла как у других меню */
             scrollbar-width: thin;
             scrollbar-color: transparent transparent; 
             transition: scrollbar-color 0.3s;
@@ -445,7 +444,7 @@
             'not_found': { ru: 'Не найдено...', uk: 'Не знайдено...', en: 'Not found...' }
         };
 
-        // --- ДАННЫЕ ДЛЯ МЕНЮ ПРЕДЛОЖЕНИЙ (НОВОЕ) ---
+        // --- ДАННЫЕ ДЛЯ МЕНЮ ПРЕДЛОЖЕНИЙ ---
         const SEARCH_SUGGESTIONS_DATA = [
             { ru: 'Арсен', uk: 'Арсен', en: 'Arsenii' },
             { ru: 'Матве', uk: 'Матві', en: 'Matviy' },
@@ -499,7 +498,7 @@
             sortLabel: document.getElementById('sort-label'),
             searchInput: document.getElementById('search-input'),
             clearButton: document.getElementById('clear-search-button'),
-            searchSuggestions: document.getElementById('search-suggestions'), // НОВОЕ
+            searchSuggestions: document.getElementById('search-suggestions'),
             themeToggle: document.getElementById('theme-toggle'),
             header: document.getElementById('main-header'),
         };
@@ -620,7 +619,7 @@
             renderAlbums();
         }, 300);
 
-        // --- ЛОГИКА ПРЕДЛОЖЕНИЙ ПОИСКА (НОВОЕ) ---
+        // --- ЛОГИКА ПРЕДЛОЖЕНИЙ ПОИСКА (ИСПРАВЛЕНО) ---
         function initSearchSuggestions() {
             UI.searchSuggestions.innerHTML = '';
             const currentLang = STRINGS.lang;
@@ -631,11 +630,9 @@
                 div.className = 'search-suggestion-item';
                 div.textContent = text;
                 
-                // Используем onmousedown, чтобы событие сработало до onblur у инпута
                 div.onmousedown = (e) => {
-                    e.preventDefault(); // Предотвращаем потерю фокуса
+                    e.preventDefault(); 
                     UI.searchInput.value = text;
-                    // Сразу запускаем поиск без задержки
                     state.search = text.trim();
                     localStorage.setItem(STORAGE_KEYS.SEARCH, state.search);
                     UI.clearButton.style.display = 'block';
@@ -646,14 +643,21 @@
                 UI.searchSuggestions.appendChild(div);
             });
 
+            // Показываем меню при фокусе
             UI.searchInput.addEventListener('focus', () => {
                 UI.searchSuggestions.classList.add('show');
             });
 
-            UI.searchInput.addEventListener('blur', () => {
-                // Скрываем меню при потере фокуса
-                UI.searchSuggestions.classList.remove('show');
+            // ВАЖНО: Останавливаем всплытие клика, чтобы глобальный слушатель window не закрыл меню сразу.
+            // Это решает проблему на десктопе (клик мышью) и на мобильных (тап).
+            UI.searchInput.addEventListener('click', (e) => {
+                e.stopPropagation();
+                UI.searchSuggestions.classList.add('show');
             });
+
+            // УДАЛЕНО: UI.searchInput.addEventListener('blur', ...) 
+            // Теперь меню закрывается только при клике вовне (через window listener), 
+            // что позволяет нормально взаимодействовать со скроллбаром меню.
         }
 
         // --- Инициализация Фильтров ---
@@ -720,7 +724,7 @@
             requestAnimationFrame(updateFiltersVisibility);
         }
 
-        // --- SCROLLBAR LOGIC ---
+        // --- SCROLLBAR LOGIC (ИСПРАВЛЕНО) ---
         function initScrollLogic() {
             let scrollTimeout;
             const scrollContainer = UI.grid;
@@ -744,7 +748,11 @@
             });
             
             UI.header.addEventListener('wheel', (e) => {
-                if (UI.menuContent.classList.contains('show') || UI.sortContent.classList.contains('show')) {
+                // Если открыто ЛЮБОЕ меню (годов, сортировки ИЛИ поиска), не скроллим альбомы.
+                // Браузер сам проскроллит меню, так как курсор над ним.
+                if (UI.menuContent.classList.contains('show') || 
+                    UI.sortContent.classList.contains('show') ||
+                    UI.searchSuggestions.classList.contains('show')) { // Добавлено
                     return; 
                 }
 
@@ -829,7 +837,7 @@
                 e.stopPropagation();
                 UI.sortContent.classList.toggle('show');
                 UI.menuContent.classList.remove('show');
-                UI.searchSuggestions.classList.remove('show'); // Скрыть предложения при клике на сортировку
+                UI.searchSuggestions.classList.remove('show');
             });
 
             document.querySelectorAll('.sort-content-item').forEach(item => {
@@ -848,13 +856,13 @@
                 e.stopPropagation();
                 UI.menuContent.classList.toggle('show');
                 UI.sortContent.classList.remove('show');
-                UI.searchSuggestions.classList.remove('show'); // Скрыть предложения при клике на меню
+                UI.searchSuggestions.classList.remove('show');
             };
 
             initYearFilters();
             renderAlbums();
             initScrollLogic();
-            initSearchSuggestions(); // Запуск инициализации меню предложений
+            initSearchSuggestions();
 
             // --- ТЕМНАЯ / СВЕТЛАЯ ТЕМА ---
             const applyTheme = (isDark) => {
