@@ -260,7 +260,8 @@
             border-radius: 8px;
             z-index: 100;
             padding: 0;
-            max-height: 200px;
+            /* ИЗМЕНЕНО: Высота для 10 пунктов (14px шрифт + 20px padding = 34px * 10 = 340px) */
+            max-height: 340px;
             overflow-y: auto;
             scrollbar-width: thin;
             scrollbar-color: transparent transparent; 
@@ -452,6 +453,7 @@
             { ru: 'авто', uk: 'авто', en: 'car' },
             { ru: 'фестиваль', uk: 'фестиваль', en: 'festival' },
             { ru: 'праздник', uk: 'свято', en: 'holiday' },
+            { ru: 'день', uk: 'день', en: 'day' },
             { ru: 'кемпинг', uk: 'кемпінг', en: 'camping' }
         ];
 
@@ -619,7 +621,7 @@
             renderAlbums();
         }, 300);
 
-        // --- ЛОГИКА ПРЕДЛОЖЕНИЙ ПОИСКА (ИСПРАВЛЕНО) ---
+        // --- ЛОГИКА ПРЕДЛОЖЕНИЙ ПОИСКА (ИСПРАВЛЕНО ДЛЯ MOBILE И ВЫСОТЫ) ---
         function initSearchSuggestions() {
             UI.searchSuggestions.innerHTML = '';
             const currentLang = STRINGS.lang;
@@ -643,21 +645,28 @@
                 UI.searchSuggestions.appendChild(div);
             });
 
-            // Показываем меню при фокусе
             UI.searchInput.addEventListener('focus', () => {
                 UI.searchSuggestions.classList.add('show');
             });
 
-            // ВАЖНО: Останавливаем всплытие клика, чтобы глобальный слушатель window не закрыл меню сразу.
-            // Это решает проблему на десктопе (клик мышью) и на мобильных (тап).
+            // ВАЖНО для Desktop: чтобы клик по инпуту не закрывал меню (из-за window click)
             UI.searchInput.addEventListener('click', (e) => {
                 e.stopPropagation();
                 UI.searchSuggestions.classList.add('show');
             });
+            
+            // ВАЖНО для Mobile: гарантия открытия при тапе
+            UI.searchInput.addEventListener('touchstart', (e) => {
+                e.stopPropagation();
+                UI.searchSuggestions.classList.add('show');
+            }, { passive: true });
 
-            // УДАЛЕНО: UI.searchInput.addEventListener('blur', ...) 
-            // Теперь меню закрывается только при клике вовне (через window listener), 
-            // что позволяет нормально взаимодействовать со скроллбаром меню.
+            // ВАЖНО для Mobile: предотвращаем закрытие при скролле (touchmove) или тапе внутри меню
+            ['click', 'touchstart', 'touchmove'].forEach(evt => {
+                UI.searchSuggestions.addEventListener(evt, (e) => {
+                    e.stopPropagation(); 
+                }, { passive: true });
+            });
         }
 
         // --- Инициализация Фильтров ---
@@ -724,7 +733,7 @@
             requestAnimationFrame(updateFiltersVisibility);
         }
 
-        // --- SCROLLBAR LOGIC (ИСПРАВЛЕНО) ---
+        // --- SCROLLBAR LOGIC ---
         function initScrollLogic() {
             let scrollTimeout;
             const scrollContainer = UI.grid;
@@ -748,11 +757,9 @@
             });
             
             UI.header.addEventListener('wheel', (e) => {
-                // Если открыто ЛЮБОЕ меню (годов, сортировки ИЛИ поиска), не скроллим альбомы.
-                // Браузер сам проскроллит меню, так как курсор над ним.
                 if (UI.menuContent.classList.contains('show') || 
                     UI.sortContent.classList.contains('show') ||
-                    UI.searchSuggestions.classList.contains('show')) { // Добавлено
+                    UI.searchSuggestions.classList.contains('show')) { 
                     return; 
                 }
 
