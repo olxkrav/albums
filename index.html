@@ -488,6 +488,9 @@
             search: ''
         };
         
+        // Переменная для исправления бага двойного срабатывания на тач-устройствах
+        let lastTouchTime = 0; 
+        
         // --- ЛОГИКА МЕНЮ ---
         
         /** Закрывает все выпадающие меню, кроме указанного (или всех, если не указано) */
@@ -671,17 +674,25 @@
                 UI.searchSuggestions.appendChild(div);
             });
             
-            // Обработчик клика: использует toggleMenu для открытия/закрытия меню поиска,
-            // обеспечивая корректное поведение "свернуть/развернуть" при повторном клике.
-            UI.searchInput.addEventListener('click', (e) => {
-                toggleMenu(UI.searchSuggestions, e);
-            });
+            // ОБНОВЛЕНИЕ: Исправление бага с двойным срабатыванием на тач-устройствах
             
-            // Обработчик для мобильных устройств
+            // 1. Обработчик touchstart (для открытия меню на мобильных устройствах)
+            // Он устанавливает метку времени последнего тача.
             UI.searchInput.addEventListener('touchstart', (e) => {
+                lastTouchTime = Date.now();
                 toggleMenu(UI.searchSuggestions, e);
             }, { passive: true });
 
+            // 2. Обработчик click (для открытия меню на десктопе)
+            // Он игнорирует событие, если тач произошел менее 500 мс назад.
+            UI.searchInput.addEventListener('click', (e) => {
+                if (Date.now() - lastTouchTime < 500) {
+                    // Игнорируем эмулированный click, который следует за touchstart
+                    return;
+                }
+                toggleMenu(UI.searchSuggestions, e);
+            });
+            
             // Предотвращение закрытия меню при взаимодействии внутри него
             ['click', 'touchstart', 'touchmove'].forEach(evt => {
                 UI.searchSuggestions.addEventListener(evt, (e) => {
