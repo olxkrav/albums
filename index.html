@@ -488,16 +488,13 @@
             search: ''
         };
         
-        // Переменная для исправления бага двойного срабатывания на тач-устройствах
-        let lastTouchTime = 0; 
-        
         // --- ЛОГИКА МЕНЮ ---
         
-        /** Закрывает все выпадающие меню, кроме указанного (или всех, если не указано) */
-        function closeAllMenus(excludeElement = null) {
+        /** Закрывает все выпадающие меню. */
+        function closeAllMenus() {
             const menus = [UI.menuContent, UI.sortContent, UI.searchSuggestions];
             menus.forEach(menu => {
-                if (menu && menu !== excludeElement) {
+                if (menu) {
                     menu.classList.remove('show');
                 }
             });
@@ -522,7 +519,7 @@
         /** Принудительно открывает меню, закрывая все остальные. Используется, например, после очистки поиска. */
         function openMenu(menuElement, e) {
             e.stopPropagation();
-            closeAllMenus(menuElement);
+            closeAllMenus();
             menuElement.classList.add('show');
         }
         
@@ -674,25 +671,17 @@
                 UI.searchSuggestions.appendChild(div);
             });
             
-            // ОБНОВЛЕНИЕ: Исправление бага с двойным срабатыванием на тач-устройствах
-            
-            // 1. Обработчик touchstart (для открытия меню на мобильных устройствах)
-            // Он устанавливает метку времени последнего тача.
-            UI.searchInput.addEventListener('touchstart', (e) => {
-                lastTouchTime = Date.now();
-                toggleMenu(UI.searchSuggestions, e);
-            }, { passive: true });
-
-            // 2. Обработчик click (для открытия меню на десктопе)
-            // Он игнорирует событие, если тач произошел менее 500 мс назад.
+            // Обработчик клика: использует toggleMenu для открытия/закрытия меню поиска,
+            // обеспечивая корректное поведение "свернуть/развернуть" при повторном клике.
             UI.searchInput.addEventListener('click', (e) => {
-                if (Date.now() - lastTouchTime < 500) {
-                    // Игнорируем эмулированный click, который следует за touchstart
-                    return;
-                }
                 toggleMenu(UI.searchSuggestions, e);
             });
             
+            // Обработчик для мобильных устройств
+            UI.searchInput.addEventListener('touchstart', (e) => {
+                toggleMenu(UI.searchSuggestions, e);
+            }, { passive: true });
+
             // Предотвращение закрытия меню при взаимодействии внутри него
             ['click', 'touchstart', 'touchmove'].forEach(evt => {
                 UI.searchSuggestions.addEventListener(evt, (e) => {
@@ -952,9 +941,23 @@
                 localStorage.setItem(STORAGE_KEYS.THEME, newThemeIsDark ? 'dark' : 'light');
             };
 
-            // Закрытие всех меню при клике в любом месте страницы
-            window.addEventListener('click', () => {
-                closeAllMenus();
+            // ЗАКРЫТИЕ МЕНЮ ПРИ КЛИКЕ ВНЕ
+            // ИСПРАВЛЕНО: Добавлен таргет-чек для предотвращения немедленного закрытия на мобильных устройствах
+            window.addEventListener('click', (e) => {
+                // Определяем элементы, клик по которым или внутри которых НЕ должен закрывать меню.
+                const excludedElements = [
+                    UI.searchInput, UI.searchSuggestions, 
+                    UI.sortButton, UI.sortContent, 
+                    UI.menuButton, UI.menuContent
+                ];
+
+                // Проверяем, произошел ли клик внутри одного из исключенных элементов.
+                // .contains() проверяет, является ли e.target потомком (или самим элементом) el.
+                let isInsideMenuArea = excludedElements.some(el => el && el.contains(e.target));
+                
+                if (!isInsideMenuArea) {
+                    closeAllMenus();
+                }
             });
         });
     </script>
