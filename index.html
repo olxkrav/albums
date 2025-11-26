@@ -513,7 +513,7 @@
             search: ''
         };
         
-        // --- ЛОГИКА ВЗАИМНОГО ЗАКРЫТИЯ МЕНЮ (НОВАЯ ФУНКЦИОНАЛЬНОСТЬ) ---
+        // --- ЛОГИКА ВЗАИМНОГО ЗАКРЫТИЯ МЕНЮ ---
         function closeAllMenus(excludeElement = null) {
             const menus = [UI.menuContent, UI.sortContent, UI.searchSuggestions];
             menus.forEach(menu => {
@@ -523,11 +523,23 @@
             });
         }
 
+        /**
+         * Корректно сворачивает/разворачивает текущее меню
+         * и при этом закрывает все остальные.
+         */
         function toggleMenu(menuElement, e) {
             e.stopPropagation();
             const isShowing = menuElement.classList.contains('show');
+            
+            // 1. Закрыть все остальные меню, кроме текущего
             closeAllMenus(menuElement);
-            if (!isShowing) {
+            
+            // 2. Свернуть/развернуть текущее меню
+            if (isShowing) {
+                // Если меню было открыто, закрыть его
+                menuElement.classList.remove('show');
+            } else {
+                // Если меню было закрыто, открыть его
                 menuElement.classList.add('show');
             }
         }
@@ -575,6 +587,7 @@
             
             switch (state.sort) {
                 case 'newest':
+                    // Учтено пользовательское требование: сортировка от новых альбомов к старым
                     sorted.sort((a, b) => b.date.localeCompare(a.date));
                     break;
                 case 'oldest':
@@ -673,17 +686,19 @@
                 UI.searchSuggestions.appendChild(div);
             });
             
-            // ОБНОВЛЕНО: Используем openMenu для закрытия других меню
-            UI.searchInput.addEventListener('focus', (e) => {
-                openMenu(UI.searchSuggestions, e);
-            });
+            // УДАЛЕНО: Слушатель 'focus' удален, чтобы устранить конфликт с 'click'
+            // UI.searchInput.addEventListener('focus', (e) => {
+            //     openMenu(UI.searchSuggestions, e);
+            // });
 
+            // ИЗМЕНЕНО: Используем toggleMenu для сворачивания/разворачивания при клике/тапе
+            // Теперь это единственный обработчик, управляющий видимостью меню при клике на поле.
             UI.searchInput.addEventListener('click', (e) => {
-                openMenu(UI.searchSuggestions, e);
+                toggleMenu(UI.searchSuggestions, e);
             });
             
             UI.searchInput.addEventListener('touchstart', (e) => {
-                openMenu(UI.searchSuggestions, e);
+                toggleMenu(UI.searchSuggestions, e);
             }, { passive: true });
 
             // Запрет закрытия меню при взаимодействии внутри
@@ -708,6 +723,8 @@
                     state.year = year;
                     localStorage.setItem(STORAGE_KEYS.YEAR, year);
                     renderAlbums();
+                    // ЗАКРЫТИЕ МЕНЮ: Закрыть все меню при клике/тапе на фильтр года
+                    closeAllMenus();
                 };
                 return el;
             };
@@ -865,17 +882,17 @@
                 handleSearchInput(e);
             });
 
-            // ОБНОВЛЕНО: Нажатие кнопки очистки вызывает меню предложений
+            // Нажатие кнопки очистки вызывает меню предложений
             UI.clearButton.addEventListener('click', (e) => {
                 UI.searchInput.value = '';
                 handleSearchInput({ target: UI.searchInput });
                 
-                // НОВОЕ: Открываем меню предложений
+                // Открываем меню предложений
                 openMenu(UI.searchSuggestions, e); 
                 UI.searchInput.focus(); 
             });
 
-            // ОБНОВЛЕНО: Использование toggleMenu для взаимного закрытия
+            // ИСПОЛЬЗУЕТ toggleMenu (работает корректно)
             UI.sortButton.addEventListener('click', (e) => {
                 toggleMenu(UI.sortContent, e);
             });
@@ -892,7 +909,7 @@
                 };
             });
 
-            // ОБНОВЛЕНО: Использование toggleMenu для взаимного закрытия
+            // ИСПОЛЬЗУЕТ toggleMenu (работает корректно)
             UI.menuButton.onclick = (e) => {
                 toggleMenu(UI.menuContent, e);
             };
@@ -930,7 +947,7 @@
                 localStorage.setItem(STORAGE_KEYS.THEME, newThemeIsDark ? 'dark' : 'light');
             };
 
-            // ОБНОВЛЕНО: Использование closeAllMenus для закрытия всех меню при клике вне
+            // ЗАКРЫТИЕ МЕНЮ ПРИ КЛИКЕ ВНЕ
             window.addEventListener('click', () => {
                 closeAllMenus();
             });
