@@ -32,8 +32,8 @@
             
             /* Цвета скроллбара */
             --color-scrollbar-thumb-light: rgba(60, 64, 67, 0.4);
-            --color-scrollbar-thumb-dark: rgba(196, 199, 197, 0.4);
             --color-scrollbar-thumb-hover-light: rgba(60, 64, 67, 0.6);
+            --color-scrollbar-thumb-dark: rgba(196, 199, 197, 0.4);
             --color-scrollbar-thumb-hover-dark: rgba(196, 199, 197, 0.6);
 
             --font-size-small: 14px;
@@ -671,11 +671,18 @@
                 UI.searchSuggestions.appendChild(div);
             });
             
-            // Обработчик клика: теперь просто открывает меню (закрывая другие)
-            // Повторный клик НЕ закрывает меню (чтобы не мешать навигации по тексту)
+            // ИЗМЕНЕНИЕ: Клик мышью (десктоп) - переключает (открывает/закрывает) меню
             UI.searchInput.addEventListener('click', (e) => {
-                openMenu(UI.searchSuggestions, e);
+                toggleMenu(UI.searchSuggestions, e);
             });
+            
+            // ИЗМЕНЕНИЕ: Тап (мобильный) - только открывает меню
+            UI.searchInput.addEventListener('touchstart', (e) => {
+                // Если меню уже открыто, то touchstart не должен ничего делать, чтобы тап не закрыл его
+                if (!UI.searchSuggestions.classList.contains('show')) {
+                    openMenu(UI.searchSuggestions, e); 
+                }
+            }, { passive: true });
             
             // Предотвращение закрытия меню при взаимодействии внутри него
             ['click', 'touchstart', 'touchmove'].forEach(evt => {
