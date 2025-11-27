@@ -677,8 +677,6 @@
                 openMenu(UI.searchSuggestions, e);
             });
             
-            // Удален обработчик touchstart, который вызывал переключение (toggle)
-
             // Предотвращение закрытия меню при взаимодействии внутри него
             ['click', 'touchstart', 'touchmove'].forEach(evt => {
                 UI.searchSuggestions.addEventListener(evt, (e) => {
@@ -781,18 +779,24 @@
                 showScroll();
             });
             
-            // Обработка прокрутки колесом мыши над шапкой
+            // --- ИЗМЕНЕНИЕ 1: Обработка прокрутки колесом мыши над шапкой (теперь без проверки открытых меню)
             UI.header.addEventListener('wheel', (e) => {
-                // Если какое-то меню открыто, не перехватываем скролл
-                if (UI.menuContent.classList.contains('show') || 
-                    UI.sortContent.classList.contains('show') ||
-                    UI.searchSuggestions.classList.contains('show')) { 
-                    return; 
-                }
-
+                // Прокрутка главного контейнера альбомов с использованием инерции
                 scrollContainer.scrollTop += e.deltaY;
                 showScroll();
-            }, { passive: true });
+                // Предотвращаем прокрутку родительского элемента (окна), что обеспечивает системную инерцию
+                e.preventDefault(); 
+            }, { passive: false }); // passive: false для e.preventDefault()
+            
+            // --- ИЗМЕНЕНИЕ 2: Блокировка прокрутки альбомов при прокрутке меню
+            [UI.menuContent, UI.sortContent, UI.searchSuggestions].forEach(menu => {
+                if (menu) {
+                    menu.addEventListener('wheel', (e) => {
+                        // Останавливаем всплытие, чтобы событие wheel не дошло до UI.header или window
+                        e.stopPropagation();
+                    }, { passive: true });
+                }
+            });
 
             // Обработка прокрутки с клавиатуры
             window.addEventListener('keydown', (e) => {
