@@ -32,8 +32,8 @@
             
             /* Цвета скроллбара */
             --color-scrollbar-thumb-light: rgba(60, 64, 67, 0.4);
-            --color-scrollbar-thumb-hover-light: rgba(60, 64, 67, 0.6);
             --color-scrollbar-thumb-dark: rgba(196, 199, 197, 0.4);
+            --color-scrollbar-thumb-hover-light: rgba(60, 64, 67, 0.6);
             --color-scrollbar-thumb-hover-dark: rgba(196, 199, 197, 0.6);
 
             --font-size-small: 14px;
@@ -484,6 +484,7 @@
 
         const state = {
             year: 'all',
+            // Устанавливаем сортировку по умолчанию на 'newest', если в хранилище ничего нет
             sort: localStorage.getItem(STORAGE_KEYS.SORT) || 'newest', 
             search: ''
         };
@@ -671,18 +672,11 @@
                 UI.searchSuggestions.appendChild(div);
             });
             
-            // ИЗМЕНЕНИЕ: Клик мышью (десктоп) - переключает (открывает/закрывает) меню
+            // *** ИЗМЕНЕНИЕ: Используем toggleMenu вместо openMenu для переключения состояния меню подсказок ***
             UI.searchInput.addEventListener('click', (e) => {
-                toggleMenu(UI.searchSuggestions, e);
+                toggleMenu(UI.searchSuggestions, e); // <-- Используем toggleMenu
             });
-            
-            // ИЗМЕНЕНИЕ: Тап (мобильный) - только открывает меню
-            UI.searchInput.addEventListener('touchstart', (e) => {
-                // Если меню уже открыто, то touchstart не должен ничего делать, чтобы тап не закрыл его
-                if (!UI.searchSuggestions.classList.contains('show')) {
-                    openMenu(UI.searchSuggestions, e); 
-                }
-            }, { passive: true });
+            // **********************************************************************************************
             
             // Предотвращение закрытия меню при взаимодействии внутри него
             ['click', 'touchstart', 'touchmove'].forEach(evt => {
@@ -788,6 +782,14 @@
             
             // --- ИЗМЕНЕНИЕ 1: Обработка прокрутки колесом мыши над шапкой (теперь без проверки открытых меню)
             UI.header.addEventListener('wheel', (e) => {
+                // Если открыто какое-либо меню (кроме поиска, который обрабатывается отдельно), 
+                // предотвращаем прокрутку главного контента.
+                if (UI.menuContent.classList.contains('show') || UI.sortContent.classList.contains('show')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return;
+                }
+                
                 // Прокрутка главного контейнера альбомов с использованием инерции
                 scrollContainer.scrollTop += e.deltaY * 5;
                 showScroll();
@@ -796,10 +798,10 @@
             }, { passive: false }); // passive: false для e.preventDefault()
             
             // --- ИЗМЕНЕНИЕ 2: Блокировка прокрутки альбомов при прокрутке меню
+            // Блокируем всплытие события wheel, чтобы прокрутка оставалась внутри меню
             [UI.menuContent, UI.sortContent, UI.searchSuggestions].forEach(menu => {
                 if (menu) {
                     menu.addEventListener('wheel', (e) => {
-                        // Останавливаем всплытие, чтобы событие wheel не дошло до UI.header или window
                         e.stopPropagation();
                     }, { passive: true });
                 }
