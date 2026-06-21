@@ -1,38 +1,41 @@
 (function() {
     'use strict';
 
-    /**
-     * Основная логика плагина
-     * Этот код регистрирует новый источник данных в Lampa
-     */
-    function initWvids() {
-        console.log('Wvids Plugin: Инициализация...');
+    function initPlugin() {
+        console.log('WVids Plugin: Инициализация...');
 
-        // Пример структуры для регистрации источника в Lampa
-        Lampa.Sources.add('wvids', {
-            name: 'Wvids',
-            host: 'https://wvids.com',
-            search: function(query, success, error) {
-                // Здесь должна быть логика запроса к wvids.com
-                // Используйте Lampa.Network.silent для запросов
-                console.log('Поиск:', query);
+        // Добавляем пункт в левое меню
+        Lampa.Listener.follow('app', function(e) {
+            if (e.type === 'ready') {
+                var menu_item = $('<li class="menu__item selector" data-action="wvids"><div class="menu__ico"><img src="https://wvids.com/favicon.ico" onerror="this.src=\'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=\'"></div><div class="menu__text">WVids</div></li>');
                 
-                // Заглушка: успешный ответ
-                success([]);
-            },
-            get: function(params, success, error) {
-                // Логика получения данных конкретного фильма/сериала
-                success({});
+                menu_item.on('hover:enter', function() {
+                    openWVids();
+                });
+
+                $('.menu__list').append(menu_item);
             }
         });
     }
 
-    // Запуск при готовности Lampa
-    if (window.lampa_initialized) {
-        initWvids();
+    function openWVids() {
+        var html = $('<div class="full-screen-modal"><h1>WVids</h1><p>Интерфейс в разработке...</p></div>');
+        Lampa.Modal.open({
+            title: 'WVids',
+            html: html,
+            size: 'large',
+            onBack: function() {
+                Lampa.Modal.close();
+            }
+        });
+    }
+
+    // Запуск плагина
+    if (window.appready) {
+        initPlugin();
     } else {
         Lampa.Listener.follow('app', function(e) {
-            if (e.type === 'ready') initWvids();
+            if (e.type === 'ready') initPlugin();
         });
     }
 })();
